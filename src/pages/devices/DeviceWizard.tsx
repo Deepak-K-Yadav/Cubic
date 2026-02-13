@@ -13,6 +13,9 @@ export default function DeviceWizard() {
   const stepFromUrl = Number(searchParams.get("step")) || 0;
 
   const [activeStep, setActiveStep] = useState(stepFromUrl);
+  const [config, setConfig] = useState<any>(null);
+  const [project, setProject] = useState<string | null>(null);
+const [device, setDevice] = useState<string | null>(null);
 
   useEffect(() => {
     setSearchParams({ step: activeStep.toString() });
@@ -20,6 +23,12 @@ export default function DeviceWizard() {
 
   const next = () => setActiveStep((s) => s + 1);
   const back = () => setActiveStep((s) => s - 1);
+
+  const handleConfigureComplete = (data: any) => {
+    setConfig(data);   // store config
+    next();            // move to next step
+  };
+  
 
   return (
     <Box
@@ -33,8 +42,8 @@ export default function DeviceWizard() {
 
       {activeStep === 0 && <SelectProject onSelect={next} />}
       {activeStep === 1 && <SelectDevice onSelect={next} onBack={back} />}
-      {activeStep === 2 && <ConfigureStep onNext={next} onBack={back} />}
-      {activeStep === 3 && <ConfirmStep onBack={back} />}
+      {activeStep === 2 && <ConfigureStep onComplete={handleConfigureComplete} onBack={back} />}
+      {activeStep === 3 && <ConfirmStep project={project} device={device} config={config} onBack={back} />}
     </Box>
   );
 }

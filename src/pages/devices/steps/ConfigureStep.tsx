@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import UploadIcon from "@mui/icons-material/Upload";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 type Props = {
   onComplete: (config: any) => void;
@@ -22,6 +22,38 @@ type Props = {
 export default function ConfigureStep({ onComplete, onBack }: Props) {
   const [firmware, setFirmware] = useState("yocto");
   const [ram, setRam] = useState(4);
+   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+
+
+ // Handle file selection
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setUploadedFile(event.target.files[0]);
+    }
+  };
+
+ // Drag events
+  const handleDragOver = (event: React.DragEvent) => {
+    event.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragging(false);
+  };
+
+   const handleDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+    setDragging(false);
+
+    if (event.dataTransfer.files && event.dataTransfer.files[0]) {
+      setUploadedFile(event.dataTransfer.files[0]);
+    }
+  };
+
 
   return (
     <Box
@@ -45,7 +77,7 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
 
         <Grid container spacing={6} alignItems="flex-start">
           {/* LEFT SIDE */}
-          <Grid item xs={12} md={5}>
+          <Grid size={{xs:12, md:5}} >
             <Typography fontWeight={600} mb={3}>
               Select available firmware
             </Typography>
@@ -104,17 +136,15 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
             </Button>
           </Grid>
 
-          {/* CENTER DIVIDER */}
           <Grid
-            item
-            md={2}
-            sx={{
-              display: { xs: "none", md: "flex" },
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-            }}
-          >
+  size={{ md: 2 }}
+  sx={{
+    display: { xs: "none", md: "flex" },
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+  }}
+>
             <Divider orientation="vertical" flexItem />
             <Typography
               sx={{
@@ -129,21 +159,37 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
           </Grid>
 
           {/* RIGHT SIDE */}
-          <Grid item xs={12} md={5}>
+          <Grid size={{xs:12, md:5}} >
             <Typography fontWeight={600} mb={3}>
               Upload your own firmware
             </Typography>
 
+             {/* Hidden File Input */}
+            <input
+              type="file"
+              hidden
+              ref={fileInputRef}
+              onChange={handleFileChange}
+            />
+
             <Paper
               variant="outlined"
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
               sx={{
                 p: 5,
                 textAlign: "center",
                 borderStyle: "dashed",
-                borderColor: "#c5c9d6",
-                backgroundColor: "rgba(255,255,255,0.6)",
+                borderColor: dragging ? "#1976d2" : "#c5c9d6",
+                backgroundColor: dragging
+                  ? "rgba(25,118,210,0.08)"
+                  : "rgba(255,255,255,0.6)",
                 borderRadius: 2,
                 mb: 2,
+                 cursor: "pointer",
+                transition: "all 0.2s ease",
               }}
             >
               <UploadIcon sx={{ fontSize: 40, mb: 2 }} />
@@ -155,6 +201,11 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
               <Typography variant="caption" display="block" mt={2}>
                 .zip file, raw binary, ELF executable, kernel loaded into RAM
               </Typography>
+               {uploadedFile && (
+                <Typography mt={2} fontWeight={500}>
+                  Selected: {uploadedFile.name}
+                </Typography>
+              )}
             </Paper>
 
             <Typography
@@ -169,11 +220,16 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
 
             <Button
               variant="contained"
-              disabled
+               disabled={!uploadedFile}
               sx={{
                 borderRadius: 2,
                 textTransform: "none",
               }}
+               onClick={() =>
+                onComplete({
+                  uploadedFile,
+                })
+              }
             >
               Next
             </Button>
