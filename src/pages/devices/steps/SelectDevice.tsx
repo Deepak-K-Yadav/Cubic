@@ -78,11 +78,11 @@ export default function SelectDevice({ onSelect, onBack }: Props) {
                     sx={{
                       height: "100%",
                       cursor: "pointer",
-                      borderRadius: 3,
+                      borderRadius: ".5",
                       p: 3,
                       textAlign: "center",
                       background: "#f5f5f7",
-                      boxShadow: "0 12px 40px rgba(0,0,0,0.06)",
+                      boxShadow: "0 12px 40px rgba(168, 163, 163, 0.06)",
                       transition: "all 0.3s ease",
                       display: "flex",
                       flexDirection: "column",

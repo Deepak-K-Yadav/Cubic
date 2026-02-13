@@ -146,7 +146,7 @@ export default function AppTopBar({
               <MenuItem
                 onClick={() => {
                   handleClose();
-                  navigate("/profile");
+                  navigate("/");
                 }}
                 sx={{ borderRadius: 2, mx: 1 }}
               >
@@ -159,7 +159,7 @@ export default function AppTopBar({
               <MenuItem
                 onClick={() => {
                   handleClose();
-                  navigate("/settings");
+                  navigate("/");
                 }}
                 sx={{ borderRadius: 2, mx: 1 }}
               >

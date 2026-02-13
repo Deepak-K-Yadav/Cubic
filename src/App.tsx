@@ -18,7 +18,8 @@ export default function App() {
 
       {/* Second Layout with Left Nav */}
       <Route path="/view" element={<LeftNavLayout />}>
-        <Route index element={<ListDevice />} />
+        <Route path="/view" index element={<ListDevice />} />
+
       </Route>
     </Routes>
   );
