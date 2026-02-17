@@ -5,6 +5,7 @@ import { Box, CircularProgress } from "@mui/material";
 import DashboardLayout from "./layout/DashboardLayout";
 import LeftNavLayout from "./layout/LeftNavLayout";
 import Settings from "./pages/viewDevice/Setting";
+import View from "./pages/viewDevice/View";
 
 
 import "./App.css";
@@ -42,6 +43,7 @@ export default function App() {
           <Route index element={<DashboardPage />} />
           <Route path="devices" element={<AddDevice />} />
           <Route path="setting" element={<Settings />} />
+         <Route path="view-new" element={<View />} />
         </Route>
 
         {/* Second Layout with Left Nav */}
