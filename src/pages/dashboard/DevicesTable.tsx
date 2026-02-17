@@ -20,6 +20,8 @@ import {
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useNavigate } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
+import Swal from "sweetalert2";
+
 
 export default function DevicesTable() {
   const navigate = useNavigate();
@@ -107,6 +109,71 @@ export default function DevicesTable() {
     }
     handleMenuClose();
   };
+
+const handleTogglePower = async () => {
+  if (!selectedRow) return;
+
+  // ✅ CLOSE MENU IMMEDIATELY
+  handleMenuClose();
+
+  const isOn = selectedRow.state === "On";
+  const actionText = isOn ? "Turn Off" : "Turn On";
+  const actionApi = isOn ? "stop" : "start";
+
+  const result = await Swal.fire({
+    title: `${actionText} Device?`,
+    text: `Are you sure you want to ${actionText.toLowerCase()} "${selectedRow.name}"?`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: isOn ? "#d33" : "#3085d6",
+    cancelButtonColor: "#6c757d",
+    confirmButtonText: `Yes, ${actionText}`,
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    const response = await fetch(
+      `${BASE_URL}/v1/instances/${selectedRow.id}/${actionApi}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to toggle power");
+    }
+
+    setDevices((prev) =>
+      prev.map((device) =>
+        device.id === selectedRow.id
+          ? { ...device, state: isOn ? "Off" : "On" }
+          : device
+      )
+    );
+
+    await Swal.fire({
+      title: "Success!",
+      text: `Device ${isOn ? "stopped" : "started"} successfully.`,
+      icon: "success",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+  } catch (error) {
+    await Swal.fire({
+      title: "Error",
+      text: "Failed to change device state.",
+      icon: "error",
+    });
+  }
+};
+
+
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -286,6 +353,14 @@ export default function DevicesTable() {
         {/* Dropdown */}
         <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
           <MenuItem onClick={handleView}>Open</MenuItem>
+
+          <MenuItem
+            onClick={handleTogglePower}
+            disabled={selectedRow?.state === "Error"}
+          >
+            {selectedRow?.state === "On" ? "Turn Off" : "Turn On"}
+          </MenuItem>
+
           <Divider />
         </Menu>
       </Paper>
