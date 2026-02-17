@@ -18,6 +18,7 @@ import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import BoltIcon from "@mui/icons-material/Bolt";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import DownloadIcon from "@mui/icons-material/Download";
 
 export default function View() {
   return (
@@ -30,10 +31,7 @@ export default function View() {
       }}
     >
       {/* Breadcrumb */}
-      <Typography
-        variant="body2"
-        sx={{ color: "#5f6b7a", mb: 2 }}
-      >
+      <Typography variant="body2" sx={{ color: "#5f6b7a", mb: 2 }}>
         Devices / Auto Cloud
       </Typography>
 
@@ -55,16 +53,14 @@ export default function View() {
           }}
         >
           <Box>
-            <Typography fontWeight={600}>
-              Connect to AutoCloud
-            </Typography>
+            <Typography fontWeight={600}>Connect to AutoCloud</Typography>
             <Typography variant="body2" color="text.secondary">
               <Box
                 component="span"
                 sx={{
                   width: 8,
                   height: 8,
-                  backgroundColor: "green",
+                  backgroundColor: "#22c55e",
                   borderRadius: "50%",
                   display: "inline-block",
                   mr: 1,
@@ -75,22 +71,29 @@ export default function View() {
           </Box>
 
           <Box display="flex" gap={1} flexWrap="wrap">
-            <Button variant="outlined" >Open Console</Button>
-            <Button variant="outlined">Snapshot</Button>
+            <Button variant="outlined" sx={{ borderRadius: 0.5 }}>
+              Open Console
+            </Button>
+            <Button variant="outlined" sx={{ borderRadius: 0.5 }}>
+              Snapshot
+            </Button>
             <Button
               variant="contained"
+              sx={{ borderRadius: 0.5 }}
               startIcon={<PlayArrowIcon />}
             >
               Start
             </Button>
             <Button
               variant="outlined"
+              sx={{ borderRadius: 0.5 }}
               startIcon={<RestartAltIcon />}
             >
               Restart
             </Button>
             <Button
               variant="outlined"
+              sx={{ borderRadius: 0.5 }}
               color="error"
               startIcon={<DeleteIcon />}
             >
@@ -114,38 +117,139 @@ export default function View() {
             }}
           >
             <CardContent>
-              {/* SSH Header */}
-              <Box display="flex" alignItems="center" gap={1} mb={2}>
+              {/* Quick SSH */}
+              <Box display="flex" alignItems="center" gap={1} mb={1}>
                 <BoltIcon color="primary" />
-                <Typography fontWeight={600}>
-                  Quick SSH Access
-                </Typography>
+                <Typography fontWeight={600}>Quick SSH Access</Typography>
               </Box>
 
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                mb={2}
-              >
-                Connect via secure SSH tunnel without VPN.
+              <Typography variant="body2" color="text.secondary" mb={2}>
+                Connect to SSH on yourvirtual device via an SSH tunnel without
+                VPN.
               </Typography>
 
               {/* SSH Command */}
-              <Box display="flex" gap={1} mb={3}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  backgroundColor: "#f3f4f6",
+                  borderRadius: 0.5,
+                  border: "1px solid #e5e7eb",
+                  overflow: "hidden",
+                  mb: 2,
+                }}
+              >
                 <TextField
                   fullWidth
                   size="small"
                   value="ssh -J user@proxy.avh.com pi@10.11.0.1"
+                  variant="standard"
+                  InputProps={{
+                    disableUnderline: true,
+                    sx: { px: 2, py: 1 },
+                  }}
                 />
-                <IconButton color="primary">
-                  <ContentCopyIcon />
+                <IconButton sx={{ borderLeft: "1px solid #e5e7eb" }}>
+                  <ContentCopyIcon fontSize="small" />
                 </IconButton>
               </Box>
 
-              <Divider sx={{ mb: 3 }} />
-
-              {/* SSH Warning */}
+              {/* Inline Warning */}
               <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  p: 1,
+                  borderRadius: 0.5,
+                  border: "1px solid #fecaca",
+                  backgroundColor: "#fef2f2",
+                  mb: 3,
+                }}
+              >
+                <WarningAmberIcon color="error" fontSize="small" />
+                <Typography variant="body2" color="error">
+                  You do not have an SSH key in your active project. You can add
+                  an SSH key to your account using our API.
+                </Typography>
+              </Box>
+
+              {/* OR Divider */}
+              <Box display="flex" alignItems="center" my={3}>
+                <Divider sx={{ flex: 1 }} />
+                <Typography sx={{ mx: 2 }} variant="body2">
+                  OR
+                </Typography>
+                <Divider sx={{ flex: 1 }} />
+              </Box>
+
+              {/* Connect via VPN */}
+              <Typography fontWeight={600} mb={1}>
+                Connect via VPN
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary" mb={2}>
+                To use gdb, ssh, or serial console you must first connect to
+                VPN.
+              </Typography>
+
+              <Typography variant="body2" mb={1}>
+                1. Download the VPN configuration file to connect.
+              </Typography>
+
+              <Button
+                variant="contained"
+                startIcon={<DownloadIcon />}
+                sx={{ mb: 3, borderRadius: 0.5 }}
+              >
+                Download OVPN File
+              </Button>
+
+              <Typography variant="body2" mb={1}>
+                2. Choose a connection method below.
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary" mb={1}>
+                &gt; _SSH <br /> Connect to SSH on your virtual device.
+              </Typography>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  backgroundColor: "#f3f4f6",
+                  borderRadius: 0.5,
+                  border: "1px solid #e5e7eb",
+                  overflow: "hidden",
+                }}
+              >
+                <TextField
+                  fullWidth
+                  size="small"
+                  value="ssh pi@10.11.0.1"
+                  variant="standard"
+                  InputProps={{
+                    disableUnderline: true,
+                    sx: { px: 2, py: 1 },
+                  }}
+                />
+                <IconButton sx={{ borderLeft: "1px solid #e5e7eb" }}>
+                  <ContentCopyIcon fontSize="small" />
+                </IconButton>
+              </Box>
+
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                mt={1}
+                display="block"
+              >
+                The default password is raspberry
+              </Typography>
+
+              {/* DO NOT TOUCH - COMMENTED BLOCK */}
+              {/* <Box
                 sx={{
                   p: 2,
                   borderRadius: 1,
@@ -171,7 +275,7 @@ export default function View() {
                 <Button variant="contained">
                   Add SSH Key
                 </Button>
-              </Box>
+              </Box> */}
             </CardContent>
           </Card>
         </Grid>
@@ -185,26 +289,25 @@ export default function View() {
             }}
           >
             <CardContent>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={2}
-              >
-                <Typography fontWeight={600}>
-                  Live Device Preview
-                </Typography>
-                <Chip
-                  label="Online"
-                  size="small"
-                  color="success"
-                />
+              <Box display="flex" justifyContent="space-between" mb={2}>
+                <Typography fontWeight={600}>Live Device Preview</Typography>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      backgroundColor: "#22c55e",
+                      borderRadius: "50%",
+                    }}
+                  />
+                  <Typography variant="body2">Online</Typography>
+                </Box>
               </Box>
 
               <Box
                 sx={{
                   height: 220,
-                  borderRadius: 1,
+                  borderRadius: 0.2,
                   backgroundImage:
                     "url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee')",
                   backgroundSize: "cover",

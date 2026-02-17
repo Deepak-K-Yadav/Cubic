@@ -10,6 +10,7 @@ import Admin from "./pages/LeftSidebarPages/Admin";
 import Hardware from "./pages/LeftSidebarPages/Hardware";
 import Lab from "./pages/LeftSidebarPages/Lab";
 import Network from "./pages/LeftSidebarPages/Network";
+import Settings from "./pages/viewDevice/Setting";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="network" element={<Network />} />
         <Route path="hardware" element={<Hardware />} />
         <Route path="lab" element={<Lab />} />
+        <Route path="setting" element={<Settings />} />
       </Route>
 
       {/* Second Layout with Left Nav */}
