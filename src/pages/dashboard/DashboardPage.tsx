@@ -23,7 +23,6 @@ export default function DashboardPage() {
   return (
     <>
       <FourGridCards />
-
       <Box
         sx={{
           p: 3,

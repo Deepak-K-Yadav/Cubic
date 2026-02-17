@@ -71,7 +71,7 @@ function playTone(type = "go") {
 function ListDevice() {
   ////
 
-  const WS_URL = import.meta.env.VITE_MQTT_WS || "ws://164.52.219.33:9001";
+  const WS_URL = import.meta.env.VITE_MQTT_WS || "wss://cubic.judgeindiasolutions.com:mqtt";
   const REQ_TOPIC = import.meta.env.VITE_REQ_TOPIC || "motu/tap/request";
   const RESP_TOPIC = import.meta.env.VITE_RESP_TOPIC || "motu/tap/response";
 

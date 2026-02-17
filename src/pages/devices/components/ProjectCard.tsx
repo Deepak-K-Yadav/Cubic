@@ -13,14 +13,30 @@ import CapacityDonut from "./CapacityDonut";
 type Props = {
   title: string;
   color: string;
+  instancesUsed: number;
+  instancesTotal: number;
+  coresUsed: number;
+  coresTotal: number;
+  internet: boolean;
   onClick: () => void;
 };
 
 export default function ProjectCard({
   title,
   color,
+  instancesUsed,
+  instancesTotal,
+  coresUsed,
+  coresTotal,
+  internet,
   onClick,
 }: Props) {
+  const unusedCores = coresTotal - coresUsed;
+  const unusedInstances = instancesTotal - instancesUsed;
+
+  const cpuUsagePercent =
+    coresTotal > 0 ? (coresUsed / coresTotal) * 100 : 0;
+
   return (
     <Card
       onClick={onClick}
@@ -43,10 +59,8 @@ export default function ProjectCard({
           justifyContent="space-between"
           alignItems="center"
           mb={3}
-          xs={3}
         >
           <Box display="flex" alignItems="center" gap={2}>
-            {/* Large Avatar */}
             <Avatar
               sx={{
                 width: 64,
@@ -67,14 +81,14 @@ export default function ProjectCard({
 
           {/* Donut */}
           <Box textAlign="center">
-            <CapacityDonut />
+            <CapacityDonut value={cpuUsagePercent} />
             <Typography
               variant="caption"
               color="text.secondary"
               mt={1}
               display="block"
             >
-              Unused Capacity
+              CPU Usage
             </Typography>
           </Box>
         </Box>
@@ -83,21 +97,27 @@ export default function ProjectCard({
         <Box display="flex" flexDirection="column" gap={1.5}>
           <Box display="flex" alignItems="center" gap={1.5}>
             <DevicesIcon fontSize="small" sx={{ color: "#7a7a7a" }} />
-            <Typography>23 Devices</Typography>
+            <Typography>
+              {instancesUsed} / {instancesTotal} Devices
+            </Typography>
           </Box>
 
           <Box display="flex" alignItems="center" gap={1.5}>
             <CpuIcon fontSize="small" sx={{ color: "#7a7a7a" }} />
-            <Typography>33 CPU Cores</Typography>
+            <Typography>
+              {coresUsed} / {coresTotal} CPU Cores
+            </Typography>
           </Box>
 
           <Box display="flex" alignItems="center" gap={1.5}>
             <NetworkIcon fontSize="small" sx={{ color: "#7a7a7a" }} />
-            <Typography>Private Network</Typography>
+            <Typography>
+              {internet ? "Internet Enabled" : "Private Network"}
+            </Typography>
           </Box>
         </Box>
 
-        {/* Bottom Info Box */}
+        {/* Bottom Info */}
         <Box
           mt={3}
           p={2}
@@ -108,9 +128,9 @@ export default function ProjectCard({
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            33 unused CPU cores,
+            {unusedCores} unused CPU cores,
             <br />
-            67 unused device slots
+            {unusedInstances} unused device slots
           </Typography>
         </Box>
       </CardContent>

@@ -1,17 +1,17 @@
+import { useState } from "react";
 import {
-  Typography,
   Box,
-  Button,
-  Container,
+  Card,
+  CardContent,
+  Typography,
   Grid,
-  Paper,
   TextField,
   Checkbox,
-  FormControlLabel,
-  IconButton,
+  Button,
+  Avatar,
 } from "@mui/material";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import CheckIcon from "@mui/icons-material/Check";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 type Props = {
   project: string | null;
@@ -26,153 +26,203 @@ export default function ConfirmStep({
   config,
   onBack,
 }: Props) {
+  // ✅ Local state for manual entry
+const [deviceName, setDeviceName] = useState("");
+
+  const [touched, setTouched] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDeviceName(e.target.value);
+  };
+
+  const handleCreate = () => {
+    if (!deviceName.trim()) return;
+
+    console.log("Device Created:", {
+      deviceName: deviceName.trim(),
+      project,
+      device,
+    });
+  };
+
+  const isError = touched && !deviceName.trim();
+
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        background:
-          "radial-gradient(circle at 20% 20%, #f3f6fb, #e6ebf5 40%, #dde3f2 100%)",
         display: "flex",
-        alignItems: "center",
+        justifyContent: "center",
+        px: { xs: 2, md: 4 },
+        py: { xs: 4, md: 6 },
       }}
     >
-      <Container maxWidth="lg">
-        {/* HEADER */}
-        <Box textAlign="center" mb={6}>
-          <Typography variant="h5" fontWeight={600}>
-            Confirm details
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Review and finalize your configuration
-          </Typography>
-        </Box>
-
-        {/* CARD */}
-        <Paper
-          elevation={0}
-          sx={{
-            p: 6,
-            borderRadius: 3,
-            background: "rgba(255,255,255,0.7)",
-            backdropFilter: "blur(8px)",
-            border: "1px solid rgba(255,255,255,0.6)",
-            position: "relative",
-          }}
-        >
-          {/* Check badge */}
-          <IconButton
-            sx={{
-              position: "absolute",
-              top: 24,
-              right: 24,
-              backgroundColor: "#3b6fb6",
-              color: "#fff",
-              width: 44,
-              height: 44,
-              "&:hover": {
-                backgroundColor: "#2f5c99",
-              },
-            }}
+      <Card
+        sx={{
+          width: "100%",
+          maxWidth: "1000px",
+          borderRadius: 3,
+          boxShadow: "0px 10px 35px rgba(0,0,0,0.08)",
+          backgroundColor: "#ffffff",
+        }}
+      >
+        <CardContent sx={{ p: { xs: 3, md: 5 } }}>
+          {/* Header */}
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={4}
           >
-            <CheckIcon />
-          </IconButton>
+            <Box display="flex" alignItems="center" gap={1.5}>
+              <SettingsOutlinedIcon
+                sx={{ color: "#2f6fdd", fontSize: 22 }}
+              />
+              <Typography variant="h6" fontWeight={600}>
+                Device Configuration
+              </Typography>
+            </Box>
 
-          <Typography fontWeight={600} mb={4}>
-            Device Configuration
-          </Typography>
+            <Avatar
+              sx={{
+                backgroundColor: "#4a76b8",
+                width: 42,
+                height: 42,
+              }}
+            >
+              <CheckIcon />
+            </Avatar>
+          </Box>
 
+          {/* Content */}
           <Grid container spacing={6}>
-            {/* LEFT COLUMN */}
+            {/* LEFT SIDE */}
             <Grid item xs={12} md={6}>
-              <Typography variant="body2" mb={1}>
-                Device name
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                mb={1}
+              >
+                Device name *
               </Typography>
 
               <TextField
                 fullWidth
-                defaultValue="lively-deer"
+                size="small"
+                value={deviceName}
+                onChange={handleChange}
+                onBlur={() => setTouched(true)}
+                placeholder="Enter device name"
+                error={isError}
+                helperText={
+                  isError ? "Device name is required" : ""
+                }
                 sx={{
                   mb: 4,
                   "& .MuiOutlinedInput-root": {
-                    borderRadius: 2,
-                    backgroundColor: "#f4f6fa",
+                    backgroundColor: "#f7f9fc",
                   },
                 }}
               />
 
-              <Typography variant="body2" fontWeight={500}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
                 Model
               </Typography>
-              <Typography mb={3} color="text.secondary">
+              <Typography mt={1} mb={4}>
                 {device || "i.MX 8M Plus"}
               </Typography>
 
-              <Typography variant="body2" fontWeight={500}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
                 Firmware type
               </Typography>
-              <Typography color="text.secondary" mb={3}>
+              <Typography mt={1}>
                 Stock example
               </Typography>
-
-              <FormControlLabel
-                control={<Checkbox size="small" />}
-                label="Set advanced boot options before creating virtual device"
-              />
             </Grid>
 
-            {/* RIGHT COLUMN */}
-            <Grid item xs={12} md={6}>
-              <Typography variant="body2" fontWeight={500}>
+            {/* RIGHT SIDE */}
+            <Grid
+              item
+              xs={12}
+              md={6}
+              sx={{ pl: { xs: 0, md: 6 } }}
+            >
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
                 Project
               </Typography>
-              <Typography mb={3} color="text.secondary">
+              <Typography mt={1} mb={4}>
                 {project || "Default Project"}
               </Typography>
 
-              <Typography variant="body2" fontWeight={500}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+              >
                 Firmware name
               </Typography>
-              <Typography color="text.secondary">
-                {config?.firmware || "Yocto Linux (full) (2.2.1)"}
+              <Typography mt={1}>
+                Yocto Linux (full) (2.2.1)
               </Typography>
             </Grid>
           </Grid>
 
-          {/* BUTTON */}
-          <Box textAlign="center" mt={6}>
+          {/* Checkbox */}
+          <Box mt={4} display="flex" alignItems="center">
+            <Checkbox size="small" />
+            <Typography variant="body2">
+              Set advanced boot options before creating virtual device
+            </Typography>
+          </Box>
+
+          {/* Create Button */}
+          <Box
+            mt={5}
+            display="flex"
+            justifyContent="center"
+          >
             <Button
               variant="contained"
+              onClick={handleCreate}
+              disabled={!deviceName.trim()}
               sx={{
-                px: 6,
-                py: 1.2,
+                backgroundColor: "#0b3d91",
+                px: 5,
+                py: 1,
                 borderRadius: 2,
                 textTransform: "none",
                 fontWeight: 500,
-                backgroundColor: "#1f4e79",
                 "&:hover": {
-                  backgroundColor: "#163a5a",
+                  backgroundColor: "#082c66",
                 },
               }}
             >
               Create device
             </Button>
           </Box>
-        </Paper>
 
-        {/* BACK */}
-        <Box textAlign="center" mt={4}>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={onBack}
-            sx={{
-              textTransform: "none",
-              color: "text.secondary",
-            }}
-          >
-            Back
-          </Button>
-        </Box>
-      </Container>
+          {/* Back Button */}
+          <Box mt={4} textAlign="center">
+            <Button
+              variant="text"
+              onClick={onBack}
+              sx={{
+                textTransform: "none",
+                color: "#444",
+              }}
+            >
+              ← Back
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
     </Box>
   );
 }
