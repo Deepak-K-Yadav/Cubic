@@ -15,9 +15,10 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useState } from "react";
 
 type Props = {
-  onComplete: (config: any) => void;
+  onComplete: (config: DeviceConfig) => void;
   onBack: () => void;
 };
+
 
 export default function ConfigureStep({ onComplete, onBack }: Props) {
   const [firmware, setFirmware] = useState("yocto");

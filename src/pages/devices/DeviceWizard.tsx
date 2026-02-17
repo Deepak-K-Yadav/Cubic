@@ -110,10 +110,11 @@ export default function DeviceWizard() {
   };
 
   const handleConfigComplete = (config: DeviceConfig) => {
-    setConfigData(config);
-    localStorage.setItem("configData", JSON.stringify(config));
-    next();
-  };
+  setConfigData(config);
+  localStorage.setItem("configData", JSON.stringify(config));
+  next();
+};
+
 
   const handleReset = () => {
     localStorage.removeItem("selectedProject");

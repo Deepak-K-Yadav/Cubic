@@ -51,7 +51,7 @@ const DeviceCard = memo(function DeviceCard({
         height: "100%",
         borderRadius: "40px",
         backgroundColor: "#f3f4f6",
-        padding: "40px 24px",
+        padding: "40px 34px",
         textAlign: "center",
         boxShadow: "0 6px 20px rgba(0,0,0,0.05)",
         transition: "all 0.25s ease",
@@ -141,7 +141,11 @@ export default function SelectDevice({ onSelect, onBack }: Props) {
 
         const data = await response.json();
 
-        const filteredData = data.filter((device: any) => !device.peripherals);
+        const filteredData = data.filter(
+          (device: any) => device.model !== "ranchu",
+        );
+
+        console.log(filteredData);
 
         setDevices(filteredData);
       } catch (error) {

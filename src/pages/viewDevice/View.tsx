@@ -31,9 +31,9 @@ export default function View() {
       }}
     >
       {/* Breadcrumb */}
-      <Typography variant="body2" sx={{ color: "#5f6b7a", mb: 2 }}>
+      {/* <Typography variant="body2" sx={{ color: "#5f6b7a", mb: 2 }}>
         Devices / Auto Cloud
-      </Typography>
+      </Typography> */}
 
       {/* Top Action Bar */}
       <Card
@@ -92,7 +92,7 @@ export default function View() {
       {/* Main Section */}
       <Grid container spacing={3}>
         {/* LEFT SECTION */}
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={{ xs: 12, md: 12 }}>
           <Card
             sx={{ borderRadius: 1, boxShadow: "0px 8px 25px rgba(0,0,0,0.05)" }}
           >
@@ -123,7 +123,7 @@ export default function View() {
                 <TextField
                   fullWidth
                   size="small"
-                  value="ssh -J user@proxy.avh.com pi@10.11.0.1"
+                  value="ssh -J 09950a8e-c304-4afc-a3f4-4f38967dd697@proxy.app.avh.corellium.com root@10.11.0.4"
                   variant="standard"
                   InputProps={{
                     disableUnderline: true,
@@ -138,7 +138,7 @@ export default function View() {
               {/* Inline Warning */}
               <Box
                 sx={{
-                  display: "flex",
+                  display: "none",
                   alignItems: "center",
                   gap: 1,
                   p: 1,
@@ -261,7 +261,7 @@ export default function View() {
         </Grid>
 
         {/* RIGHT SECTION */}
-        <Grid size={{ xs: 12, md: 4 }}>
+        {/* <Grid size={{ xs: 12, md: 4 }}>
           <Card
             sx={{ borderRadius: 1, boxShadow: "0px 8px 25px rgba(0,0,0,0.05)" }}
           >
@@ -302,7 +302,7 @@ export default function View() {
               </Typography>
             </CardContent>
           </Card>
-        </Grid>
+        </Grid> */}
       </Grid>
     </Box>
   );

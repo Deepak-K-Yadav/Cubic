@@ -4,11 +4,11 @@ import {
   Typography,
   Box,
   Avatar,
+  Chip,
 } from "@mui/material";
 import DevicesIcon from "@mui/icons-material/DeveloperBoard";
 import CpuIcon from "@mui/icons-material/Memory";
 import NetworkIcon from "@mui/icons-material/Public";
-import CapacityDonut from "./CapacityDonut";
 
 type Props = {
   title: string;
@@ -34,103 +34,85 @@ export default function ProjectCard({
   const unusedCores = coresTotal - coresUsed;
   const unusedInstances = instancesTotal - instancesUsed;
 
-  const cpuUsagePercent =
-    coresTotal > 0 ? (coresUsed / coresTotal) * 100 : 0;
-
   return (
     <Card
       onClick={onClick}
       sx={{
-        borderRadius: 3,
+        borderRadius: 1,
         cursor: "pointer",
         transition: "all 0.25s ease",
         backgroundColor: "#fff",
-        boxShadow: "0 6px 24px rgba(0,0,0,0.05)",
+        border: "1px solid #eef2f7",
         "&:hover": {
           transform: "translateY(-6px)",
           boxShadow: "0 14px 40px rgba(0,0,0,0.08)",
         },
       }}
     >
-      <CardContent sx={{ p: 3 }}>
-        {/* Top Row */}
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={3}
-        >
-          <Box display="flex" alignItems="center" gap={2}>
-            <Avatar
-              sx={{
-                width: 64,
-                height: 64,
-                borderRadius: 2,
-                bgcolor: color,
-                fontSize: 28,
-                fontWeight: 600,
-              }}
-            >
-              {title.charAt(0)}
-            </Avatar>
+      <CardContent sx={{ p: 2 }}>
+        {/* Header */}
+        <Box display="flex" alignItems="center" gap={2} mb={3}>
+          <Avatar
+            sx={{
+              width: 56,
+              height: 56,
+              borderRadius: 2,
+              bgcolor: color,
+              fontSize: 24,
+              fontWeight: 600,
+            }}
+          >
+            {title.charAt(0)}
+          </Avatar>
 
+          <Box>
             <Typography variant="h6" fontWeight={600}>
               {title}
             </Typography>
-          </Box>
 
-          {/* Donut */}
-          <Box textAlign="center">
-            <CapacityDonut value={cpuUsagePercent} />
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              mt={1}
-              display="block"
-            >
-              CPU Usage
-            </Typography>
+            <Chip
+              size="small"
+              label={internet ? "Internet Enabled" : "Private Network"}
+              sx={{
+                mt: 1,
+                backgroundColor: internet ? "#e3f2fd" : "#f1f3f5",
+                color: internet ? "#1565c0" : "#555",
+                fontWeight: 500,
+              }}
+            />
           </Box>
         </Box>
 
-        {/* Details */}
-        <Box display="flex" flexDirection="column" gap={1.5}>
+        {/* Resource Info */}
+        <Box display="flex" flexDirection="column" gap={2}>
           <Box display="flex" alignItems="center" gap={1.5}>
             <DevicesIcon fontSize="small" sx={{ color: "#7a7a7a" }} />
-            <Typography>
-              {instancesUsed} / {instancesTotal} Devices
+            <Typography fontSize={14}>
+              <strong>{instancesUsed}</strong> / {instancesTotal} Devices
             </Typography>
           </Box>
 
           <Box display="flex" alignItems="center" gap={1.5}>
             <CpuIcon fontSize="small" sx={{ color: "#7a7a7a" }} />
-            <Typography>
-              {coresUsed} / {coresTotal} CPU Cores
-            </Typography>
-          </Box>
-
-          <Box display="flex" alignItems="center" gap={1.5}>
-            <NetworkIcon fontSize="small" sx={{ color: "#7a7a7a" }} />
-            <Typography>
-              {internet ? "Internet Enabled" : "Private Network"}
+            <Typography fontSize={14}>
+              <strong>{coresUsed}</strong> / {coresTotal} CPU Cores
             </Typography>
           </Box>
         </Box>
 
-        {/* Bottom Info */}
+        {/* Bottom Capacity Info */}
         <Box
           mt={3}
           p={2}
           sx={{
-            backgroundColor: "#f4f7fb",
+            backgroundColor: "#f8fafc",
             borderRadius: 2,
-            border: "1px solid #e6edf7",
+            border: "1px solid #eef2f7",
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            {unusedCores} unused CPU cores,
-            <br />
-            {unusedInstances} unused device slots
+            {unusedCores} unused CPU cores • {unusedInstances} unused device
+            slots
           </Typography>
         </Box>
       </CardContent>

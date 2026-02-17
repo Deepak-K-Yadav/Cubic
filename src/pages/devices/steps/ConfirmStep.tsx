@@ -12,8 +12,8 @@ import {
 } from "@mui/material";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import CheckIcon from "@mui/icons-material/Check";
+import { useNavigate } from "react-router-dom";
 
-/* ✅ Proper device type */
 type DeviceType = {
   type?: string;
   name?: string;
@@ -37,20 +37,28 @@ export default function ConfirmStep({
   config,
   onBack,
 }: Props) {
-  const [deviceName, setDeviceName] = useState(config?.deviceName || "");
 
+  
+  const [deviceName, setDeviceName] = useState(config?.deviceName || "");
   const [touched, setTouched] = useState(false);
+  const [apiMessage, setApiMessage] = useState<string | null>(null);
+  const [isErrorMessage, setIsErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const BASE_URL = "https://judge.app.avh.corellium.com/api";
+  const API_KEY = import.meta.env.VITE_CORELLIUM_API_KEY;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDeviceName(e.target.value);
   };
 
-  const BASE_URL = "https://judge.app.avh.corellium.com/api";
-  const API_KEY = import.meta.env.VITE_CORELLIUM_API_KEY;
-
   const handleCreate = async () => {
     debugger;
     if (!deviceName.trim() || !project || !device) return;
+
+    setLoading(true);
+    setApiMessage(null);
 
     try {
       const response = await fetch(`${BASE_URL}/v1/instances`, {
@@ -61,35 +69,37 @@ export default function ConfirmStep({
         },
         body: JSON.stringify({
           project: project,
-          name: deviceName.trim(), // dynamic from input
-          flavor: device.flavor || "rpi4b",
-          os: "11.2.0",
+          name: deviceName.trim(),
+          flavor: device?.flavor || "imx93",
+          os: config?.os || "imx93",
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to create device");
-      }
-
       const data = await response.json();
 
-      console.log("Device Created Successfully:", data);
-    } catch (error) {
-      console.error("Create Device Error:", error);
+      if (!response.ok) {
+        setIsErrorMessage(true);
+        setApiMessage(data?.error || "Failed to create device");
+        return;
+      }
+
+      setIsErrorMessage(false);
+      setApiMessage("Device created successfully 🎉");
+      setTimeout(() => {
+        navigate("/");
+      }, 5000); // 5000ms = 5 seconds
+    } catch (error: any) {
+      setIsErrorMessage(true);
+      setApiMessage(error.message || "Unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
   const isError = touched && !deviceName.trim();
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        px: { xs: 2, md: 4 },
-        py: { xs: 4, md: 6 },
-      }}
-    >
+    <Box display="flex" justifyContent="center">
       <Card
         sx={{
           width: "100%",
@@ -125,9 +135,21 @@ export default function ConfirmStep({
             </Avatar>
           </Box>
 
+          {/* ✅ API Message (Design Safe) */}
+          {apiMessage && (
+            <Typography
+              mb={3}
+              sx={{
+                color: isErrorMessage ? "#d32f2f" : "#2e7d32",
+                fontWeight: 500,
+              }}
+            >
+              {apiMessage}
+            </Typography>
+          )}
+
           {/* Content */}
           <Grid container spacing={6}>
-            {/* LEFT SIDE */}
             <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="body2" color="text.secondary" mb={1}>
                 Device name *
@@ -155,7 +177,7 @@ export default function ConfirmStep({
               </Typography>
 
               <Typography mt={1} mb={4}>
-                {device?.name || device?.model || "i.MX 8M Plus"}
+                {device?.name || device?.model}
               </Typography>
 
               <Typography variant="body2" color="text.secondary">
@@ -163,25 +185,25 @@ export default function ConfirmStep({
               </Typography>
 
               <Typography mt={1}>
-                {device?.flavor || "Stock example"}
+                {/* {config?.firmware || "Not selected"} */}
+                Stock Example
               </Typography>
             </Grid>
 
-            {/* RIGHT SIDE */}
             <Grid size={{ xs: 12, md: 6 }} sx={{ pl: { xs: 0, md: 6 } }}>
               <Typography variant="body2" color="text.secondary">
                 Project
               </Typography>
 
               <Typography mt={1} mb={4}>
-                {project || "Default Project"}
+                {project}
               </Typography>
 
               <Typography variant="body2" color="text.secondary">
                 Firmware name
               </Typography>
 
-              <Typography mt={1}>Yocto Linux (full) (2.2.1)</Typography>
+              <Typography mt={1}>{config?.firmware}</Typography>
             </Grid>
           </Grid>
 
@@ -198,7 +220,7 @@ export default function ConfirmStep({
             <Button
               variant="contained"
               onClick={handleCreate}
-              disabled={!deviceName.trim()}
+              disabled={!deviceName.trim() || loading}
               sx={{
                 backgroundColor: "#0b3d91",
                 px: 5,
@@ -211,7 +233,7 @@ export default function ConfirmStep({
                 },
               }}
             >
-              Create device
+              {loading ? "Creating..." : "Create device"}
             </Button>
           </Box>
 

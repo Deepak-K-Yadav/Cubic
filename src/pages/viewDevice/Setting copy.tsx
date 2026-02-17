@@ -9,12 +9,11 @@ import {
   Checkbox,
   FormControlLabel,
   Link,
-  Switch,
 } from "@mui/material";
 import { useState } from "react";
 import UploadIcon from "@mui/icons-material/Upload";
 
-export default function Settings( props: { deviceName?: string; model?: string } ) {
+export default function Settings() {
   const [tab, setTab] = useState(0);
   const [bootArgs, setBootArgs] = useState(
     "console=ttyLP0,115200 earlycon= root=/dev/mmcblk0p2",
@@ -28,11 +27,6 @@ export default function Settings( props: { deviceName?: string; model?: string }
   const [vmmioList, setVmmioList] = useState<
     { start: string; size: string; irq: string }[]
   >([]);
-
-  const [sensorEnabled, setSensorEnabled] = useState(false);
-  const [selectedCamera, setSelectedCamera] = useState("");
-  const [selectedMic, setSelectedMic] = useState("");
-  const [mediaUrl, setMediaUrl] = useState("");
 
   const [disablePoweroff, setDisablePoweroff] = useState(false);
 
@@ -131,12 +125,12 @@ export default function Settings( props: { deviceName?: string; model?: string }
           "linear-gradient(180deg, #eef3fb 0%, #f6f8fc 40%, #f4f6fa 100%)",
       }}
     >
-      {/* <Typography
+      <Typography
         variant="body2"
         sx={{ color: "#6b778c", mb: 2, fontSize: 13 }}
       >
         Devices / Auto Cloud
-      </Typography> */}
+      </Typography>
 
       <Box
         sx={{
@@ -163,50 +157,29 @@ export default function Settings( props: { deviceName?: string; model?: string }
             </Typography>
           </Box>
 
-          <Box display="flex" alignItems="center" gap={1.5}>
-            <Button
-              variant="outlined"
-              sx={{
-                borderRadius: 0.5,
-                textTransform: "none",
-                fontSize: 13,
-                px: 3,
-                py: 0.8,
-                borderColor: "#d1d5db",
-                color: "#374151",
-                "&:hover": {
-                  borderColor: "#9ca3af",
-                  backgroundColor: "#f9fafb",
-                },
-              }}
-            >
-              Back
-            </Button>
-
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: "#0b3c5d",
-                borderRadius: 0.5,
-                textTransform: "none",
-                fontSize: 13,
-                px: 3,
-                py: 0.8,
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "#0b3c5d",
+              borderRadius: 0.5,
+              textTransform: "none",
+              fontSize: 13,
+              px: 3,
+              py: 0.8,
+              boxShadow: "none",
+              "&:hover": {
+                backgroundColor: "#072a44",
                 boxShadow: "none",
-                "&:hover": {
-                  backgroundColor: "#072a44",
-                  boxShadow: "none",
-                },
-              }}
-            >
-              Save & restart
-            </Button>
-          </Box>
+              },
+            }}
+          >
+            Save & restart
+          </Button>
         </Box>
 
         <Grid container spacing={3}>
           {/* LEFT SECTION */}
-          <Grid size={{ xs: 12, md: 12 }}>
+          <Grid size={{ xs: 12, md: 8 }}>
             {/* Tabs */}
             <Tabs
               value={tab}
@@ -224,7 +197,6 @@ export default function Settings( props: { deviceName?: string; model?: string }
                 "Kernel",
                 "Device Tree",
                 "Custom vMMIO",
-                "Sensor",
               ].map((label, index) => (
                 <Tab
                   key={label}
@@ -262,7 +234,7 @@ export default function Settings( props: { deviceName?: string; model?: string }
                 <TextField
                   fullWidth
                   size="small"
-                  value={props.deviceName || "Cubic Corp"}
+                  value="Cubic Corp"
                   sx={{
                     mb: 3,
                     "& .MuiOutlinedInput-root": {
@@ -277,7 +249,7 @@ export default function Settings( props: { deviceName?: string; model?: string }
                     label="Created on"
                     value="Jan 21, 2025 at 6:43:45 PM"
                   />
-                  <InfoRow label="Firmware name" value={props.deviceName || "Cubic Corp"} />
+                  <InfoRow label="Firmware name" value="11.2.0" />
                   <InfoRow label="Specifications" value="rpi4b (product)" />
                 </Box>
               </Box>
@@ -729,171 +701,43 @@ export default function Settings( props: { deviceName?: string; model?: string }
                 </Button>
               </Box>
             )}
-
-            {/* SENSOR TAB */}
-            {tab === 6 && (
-              <Box
-                sx={{
-                  border: "1px solid #e6e9f0",
-                  borderRadius: 0.5,
-                  p: 3,
-                }}
-              >
-                {/* Header */}
-                <Typography sx={{ fontWeight: 600, fontSize: 16, mb: 2 }}>
-                  Camera and Microphone
-                </Typography>
-                <Typography sx={{ fontSize: 13, color: "#6b7280" }}>
-                  Enable the camera and microphone for this browser.
-                </Typography>
-
-                {/* Enable Toggle */}
-                <Box sx={{ mb: 3 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography sx={{ fontSize: 14, fontWeight: 500 }}>
-                      Enable
-                    </Typography>
-
-                    <Switch
-                      checked={sensorEnabled}
-                      onChange={(e) => setSensorEnabled(e.target.checked)}
-                      size="small"
-                      sx={{
-                        "& .MuiSwitch-switchBase.Mui-checked": {
-                          color: "#0b3c5d",
-                        },
-                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
-                          {
-                            backgroundColor: "#0b3c5d",
-                          },
-                      }}
-                    />
-                  </Box>
-                </Box>
-
-                {/* Camera Select */}
-                <Typography sx={{ fontSize: 13, color: "#6b7280", mb: 1 }}>
-                  Camera
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  select
-                  SelectProps={{ native: true }}
-                  value={selectedCamera}
-                  onChange={(e) => setSelectedCamera(e.target.value)}
-                  sx={{
-                    mb: 3,
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 0.5,
-                      backgroundColor: "#fafbfc",
-                      fontSize: 13,
-                    },
-                  }}
-                >
-                  <option value="">Select...</option>
-                  <option value="camera1">Integrated Camera</option>
-                  <option value="camera2">External USB Camera</option>
-                </TextField>
-
-                {/* Microphone Select */}
-                <Typography sx={{ fontSize: 13, color: "#6b7280", mb: 1 }}>
-                  Microphone
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  select
-                  SelectProps={{ native: true }}
-                  value={selectedMic}
-                  onChange={(e) => setSelectedMic(e.target.value)}
-                  sx={{
-                    mb: 3,
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 0.5,
-                      backgroundColor: "#fafbfc",
-                      fontSize: 13,
-                    },
-                  }}
-                >
-                  <option value="">Select...</option>
-                  <option value="mic1">Built-in Microphone</option>
-                  <option value="mic2">External Microphone</option>
-                </TextField>
-
-                {/* Upload Section */}
-                <Typography sx={{ fontSize: 13, color: "#6b7280", mb: 1 }}>
-                  Upload
-                </Typography>
-                <UploadBox onFileSelect={(file) => console.log(file)} />
-
-                <Typography
-                  sx={{
-                    textAlign: "center",
-                    fontSize: 12,
-                    color: "#9ca3af",
-                    my: 2,
-                  }}
-                >
-                  or
-                </Typography>
-
-                {/* Media URL */}
-                <Typography sx={{ fontSize: 13, color: "#6b7280", mb: 1 }}>
-                  Media URL
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  placeholder="https://example.com/video.mp4"
-                  value={mediaUrl}
-                  onChange={(e) => setMediaUrl(e.target.value)}
-                  sx={{
-                    mb: 3,
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 0.5,
-                      backgroundColor: "#fafbfc",
-                      fontSize: 13,
-                    },
-                  }}
-                />
-
-                {/* Buttons */}
-                <Box display="flex" gap={2}>
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor: "#6b7280",
-                      textTransform: "none",
-                      fontSize: 13,
-                      px: 2.5,
-                      py: 0.8,
-                      borderRadius: 0.5,
-                      boxShadow: "none",
-                      "&:hover": { backgroundColor: "#4b5563" },
-                    }}
-                  >
-                    Play media
-                  </Button>
-
-                  <Button
-                    variant="outlined"
-                    sx={{
-                      textTransform: "none",
-                      fontSize: 13,
-                      px: 2.5,
-                      py: 0.8,
-                      borderRadius: 0.5,
-                    }}
-                  >
-                    Stop media
-                  </Button>
-                </Box>
-              </Box>
-            )}
           </Grid>
 
-        
+          {/* RIGHT SECTION */}
+          {/* <Grid size={{ xs: 12, md: 4 }}>
+            <Box
+              sx={{
+                border: "1px solid #e6e9f0",
+                borderRadius: 0.5,
+                p: 2.5,
+              }}
+            >
+              <Typography sx={{ fontWeight: 600, fontSize: 14, mb: 2 }}>
+                Live Device Preview
+              </Typography>
+
+              <Box
+                sx={{
+                  height: 220,
+                  borderRadius: 0.2,
+                  backgroundImage:
+                    "url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
+
+              <Typography
+                sx={{
+                  mt: 2,
+                  color: "#6b7280",
+                  fontSize: 12,
+                }}
+              >
+                • One user per device at a time
+              </Typography>
+            </Box>
+          </Grid> */}
         </Grid>
       </Box>
     </Box>

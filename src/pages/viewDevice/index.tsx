@@ -12,6 +12,9 @@ import HardwarePage from "./console/HardwarePage.tsx";
 import Fade from "@mui/material/Fade";
 import mqtt from "mqtt";
 
+import Settings from "./Setting";
+import View from "./View";
+
 import "./device.css";
 
 const DEFAULT_FROM = "Central";
@@ -256,7 +259,7 @@ function ListDevice() {
             right: 0,
             top: "50%",
             transform: "translateY(-50%)",
-            display: "flex",
+            display: "none",
             alignItems: "center",
             gap: 3,
           }}
@@ -265,15 +268,15 @@ function ListDevice() {
             sx={{ cursor: "pointer", fontWeight: 600 }}
             onClick={() => navigate("/sensor")}
           >
-            sensor
+            Sensors
           </Typography>
-          ||
+          |
 
           <Typography
             sx={{ cursor: "pointer", fontWeight: 600 }}
             onClick={() => navigate("/setting")}
           >
-            config
+            Settings
           </Typography>
         </Box>
 
@@ -586,6 +589,10 @@ function ListDevice() {
           </Paper>
         </Grid>
       </Grid>
+
+{/* //Device: {deviceData?.name} - {deviceData?.model} */}
+      <Settings deviceName={deviceData?.name} model={deviceData?.model} />
+      <View />
     </Box>
   );
 }

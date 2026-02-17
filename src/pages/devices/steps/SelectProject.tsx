@@ -11,7 +11,7 @@ import React from "react";
 import ProjectCard from "../components/ProjectCard";
 
 type Props = {
-  onSelect: (project: string) => void;
+  onSelect: (projectId: string) => void; // ✅ Now expects projectId
 };
 
 export default function SelectProject({ onSelect }: Props) {
@@ -23,7 +23,9 @@ export default function SelectProject({ onSelect }: Props) {
   const [loading, setLoading] = React.useState(true);
   const [search, setSearch] = React.useState("");
 
-  // 🔥 Fetch Projects
+  /* --------------------------------------------------
+     🔥 Fetch Projects
+  -------------------------------------------------- */
   React.useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -37,8 +39,9 @@ export default function SelectProject({ onSelect }: Props) {
         if (!response.ok) throw new Error("Failed to fetch projects");
 
         const data = await response.json();
-        setProjects(data);
-        setFilteredProjects(data);
+
+        setProjects(data || []);
+        setFilteredProjects(data || []);
       } catch (error) {
         console.error("Project API Error:", error);
       } finally {
@@ -47,18 +50,22 @@ export default function SelectProject({ onSelect }: Props) {
     };
 
     fetchProjects();
-  }, []);
+  }, [BASE_URL, API_KEY]);
 
-  // 🔎 Search filter
+  /* --------------------------------------------------
+     🔎 Search Filter
+  -------------------------------------------------- */
   React.useEffect(() => {
     const filtered = projects.filter((project) =>
-      project.name.toLowerCase().includes(search.toLowerCase())
+      project.name?.toLowerCase().includes(search.toLowerCase())
     );
+
     setFilteredProjects(filtered);
   }, [search, projects]);
 
   return (
     <Box sx={{ maxWidth: 1200, mx: "auto", px: 3 }}>
+      {/* Title */}
       <Typography variant="h4" align="center" fontWeight={600} mb={2}>
         Select Project
       </Typography>
@@ -79,7 +86,11 @@ export default function SelectProject({ onSelect }: Props) {
           placeholder="Search for Projects"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          sx={{ width: 350, bgcolor: "#fff", borderRadius: 2 }}
+          sx={{
+            width: 350,
+            bgcolor: "#fff",
+            borderRadius: 2,
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -103,7 +114,7 @@ export default function SelectProject({ onSelect }: Props) {
           {filteredProjects.map((project) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={project.id}>
               <ProjectCard
-                title={project.name}
+                title={project.name} // ✅ Display name
                 color="#4a90e2"
                 instancesUsed={project.quotasUsed?.instances ?? 0}
                 instancesTotal={project.quotas?.instances ?? 0}
@@ -112,7 +123,7 @@ export default function SelectProject({ onSelect }: Props) {
                 internet={
                   project.settings?.["internet-access"] ?? false
                 }
-                onClick={() => onSelect(project.name)}
+                onClick={() => onSelect(project.id)} // ✅ PASS PROJECT ID
               />
             </Grid>
           ))}

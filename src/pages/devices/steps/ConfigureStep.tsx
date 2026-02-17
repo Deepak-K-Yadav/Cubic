@@ -32,6 +32,7 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [dragging, setDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [os, setOs] = useState("");
 
   /* --------------------------------------------
      🔹 Fetch Firmware List
@@ -48,11 +49,15 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
             },
           }
         );
-
+        
         if (!response.ok) throw new Error("Failed to fetch firmware list");
 
         const data = await response.json();
         setFirmwareList(data || []);
+
+        setOs(data[0]?.version || "Unknown OS");
+
+        console.log(data[0]?.version, "Firmware List API Response");
 
         if (data && data.length > 0) {
           setFirmware(data[0].filename);
@@ -132,6 +137,7 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
                 backgroundColor: "rgba(255,255,255,0.7)",
                 borderRadius: 2,
                 maxWidth: 400,
+                minWidth: 400
               }}
             >
               {loadingFirmware ? (
@@ -183,7 +189,7 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
                 textTransform: "none",
                 fontWeight: 600,
               }}
-              onClick={() => onComplete({ firmware, ram })}
+              onClick={() => onComplete({ firmware, ram, os })}
             >
               Select
             </Button>

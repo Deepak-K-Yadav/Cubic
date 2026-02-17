@@ -77,7 +77,7 @@ export default function DashboardStats() {
         <Grid size={3}>
           <StatCard
             title="Projects"
-            value="165 projects"
+            value="3 projects"
             icon={<FolderIcon />}
             iconBg="#E0F2FE"
             iconColor="#2563EB"
@@ -87,8 +87,8 @@ export default function DashboardStats() {
         <Grid size={3}>
           <StatCard
             title="Devices"
-            value="6"
-            subtitle="Running out of 165 Devices"
+            value="2"
+            subtitle="2 out of 30 devices"
             icon={<DevicesIcon />}
             iconBg="#DCFCE7"
             iconColor="#16A34A"

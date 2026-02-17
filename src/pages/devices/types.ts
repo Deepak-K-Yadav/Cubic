@@ -14,4 +14,5 @@ export interface DeviceConfig {
   firmware?: string;
   ram?: number;
   uploadedFile?: File | null;
+  os: string;
 }
