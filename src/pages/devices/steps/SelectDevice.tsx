@@ -4,7 +4,6 @@ import {
   Typography,
   Box,
   Card,
-  CardContent,
   TextField,
   InputAdornment,
   IconButton,
@@ -18,13 +17,90 @@ import SearchIcon from "@mui/icons-material/Search";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { useEffect, useMemo, useState } from "react";
+
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  memo,
+} from "react";
 
 type Props = {
   onSelect: (device: Device) => void;
   onBack: () => void;
 };
 
+type DeviceCardProps = {
+  device: any;
+  baseUrl: string;
+  onSelect: (device: any) => void;
+};
+
+/* =========================
+   MEMOIZED DEVICE CARD
+========================= */
+const DeviceCard = memo(function DeviceCard({
+  device,
+  baseUrl,
+  onSelect,
+}: DeviceCardProps) {
+  // 🔹 Memoized image URL
+  const imageUrl = useMemo(() => {
+    return `${baseUrl}/v1/flavors/${device?.flavor}/productimage`;
+  }, [baseUrl, device?.flavor]);
+
+  return (
+    <Card
+      onClick={() => onSelect(device)}
+      sx={{
+        height: "100%",
+        borderRadius: "40px",
+        backgroundColor: "#f3f4f6",
+        padding: "40px 24px",
+        textAlign: "center",
+        boxShadow: "0 6px 20px rgba(0,0,0,0.05)",
+        transition: "all 0.25s ease",
+        "&:hover": {
+          transform: "translateY(-6px)",
+        },
+      }}
+    >
+      <Box
+        sx={{
+          height: 160,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mb: 3,
+        }}
+      >
+        <Box
+          component="img"
+          src={imageUrl}
+          loading="lazy"
+          sx={{
+            maxHeight: 130,
+            maxWidth: "100%",
+            objectFit: "contain",
+          }}
+        />
+      </Box>
+
+      <Typography fontWeight={700} fontSize={16}>
+        {device.description || device.name}
+      </Typography>
+
+      <Typography variant="body2" color="text.secondary">
+        Requires {device.quotas?.cores ?? 1} CPU cores
+      </Typography>
+    </Card>
+  );
+});
+
+/* =========================
+   MAIN COMPONENT
+========================= */
 export default function SelectDevice({ onSelect, onBack }: Props) {
   const BASE_URL = import.meta.env.VITE_CORELLIUM_BASE;
   const API_KEY = import.meta.env.VITE_CORELLIUM_API_KEY;
@@ -35,42 +111,76 @@ export default function SelectDevice({ onSelect, onBack }: Props) {
   const [showBanner, setShowBanner] = useState(true);
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  const fetchModels = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/v1/models`, {
-        headers: {
-          Authorization: `Bearer ${API_KEY}`,
-          "Content-Type": "application/json",
-        },
-      });
+  useEffect(() => {
+  if (!devices.length) return;
 
-      if (!response.ok) throw new Error("Failed to fetch models");
+  const links: HTMLLinkElement[] = [];
 
-      const data = await response.json();
+  devices.forEach((device) => {
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.href = `${BASE_URL}/v1/flavors/${device?.flavor}/productimage`;
+    document.head.appendChild(link);
+    links.push(link);
+  });
 
-      // 🔹 Remove devices where peripheral is false
-      const filteredData = data.filter(
-        (device: any) => device.peripheral !== true
-      );
-
-      setDevices(filteredData);
-    } catch (error) {
-      console.error("Models API Error:", error);
-    } finally {
-      setLoading(false);
-    }
+  return () => {
+    links.forEach((link) => document.head.removeChild(link));
   };
-
-  fetchModels();
-}, [BASE_URL, API_KEY]);
+}, [devices, BASE_URL]);
 
 
-  // 🔹 Search + Filter
+  /* =========================
+     FETCH DEVICES
+  ========================= */
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/v1/models`, {
+          headers: {
+            Authorization: `Bearer ${API_KEY}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch models");
+
+        const data = await response.json();
+
+        const filteredData = data.filter(
+          (device: any) => device.peripheral !== true
+        );
+
+        setDevices(filteredData);
+      } catch (error) {
+        console.error("Models API Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchModels();
+  }, [BASE_URL, API_KEY]);
+
+  /* =========================
+     STABLE SELECT HANDLER
+  ========================= */
+  const handleSelect = useCallback(
+    (device: any) => {
+      onSelect(device);
+    },
+    [onSelect]
+  );
+
+  /* =========================
+     FILTERED DEVICES
+  ========================= */
   const filteredDevices = useMemo(() => {
     return devices.filter((device) => {
       const matchesFilter =
-        filter === "All" || device.type?.toLowerCase() === filter.toLowerCase();
+        filter === "All" ||
+        device.type?.toLowerCase() === filter.toLowerCase();
 
       const matchesSearch =
         device.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -90,7 +200,7 @@ useEffect(() => {
     >
       <Container maxWidth="lg">
         <Stack spacing={6}>
-          {/* ===== HEADER SECTION ===== */}
+          {/* HEADER */}
           <Box
             sx={{
               display: "flex",
@@ -109,7 +219,6 @@ useEffect(() => {
               </Typography>
             </Box>
 
-            {/* Search + Filter */}
             <Stack direction="row" spacing={2}>
               <TextField
                 size="small"
@@ -160,60 +269,14 @@ useEffect(() => {
             </Stack>
           </Box>
 
-          {/* ===== INFO BANNER ===== */}
-          {showBanner && (
-            <Paper
-              elevation={0}
-              sx={{
-                p: 4,
-                borderRadius: 4,
-                background: "linear-gradient(135deg, #f5f7fb 0%, #eef2f7 100%)",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-              }}
-            >
-              <Box sx={{ display: "flex", gap: 2 }}>
-                <InfoOutlinedIcon color="action" />
-                <Box>
-                  <Typography fontWeight={600}>
-                    Need a device not listed here?
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mt: 0.5 }}
-                  >
-                    Contact your sales person for pricing and availability.
-                  </Typography>
-                  <Button
-                    endIcon={<ArrowForwardIcon />}
-                    sx={{
-                      mt: 1.5,
-                      p: 0,
-                      textTransform: "none",
-                      fontWeight: 600,
-                    }}
-                  >
-                    Request a device
-                  </Button>
-                </Box>
-              </Box>
-
-              <IconButton size="small" onClick={() => setShowBanner(false)}>
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            </Paper>
-          )}
-
-          {/* ===== LOADING ===== */}
+          {/* LOADING */}
           {loading && (
             <Box textAlign="center" py={6}>
               <CircularProgress />
             </Box>
           )}
 
-          {/* ===== DEVICE GRID ===== */}
+          {/* DEVICE GRID */}
           {!loading && (
             <Grid container spacing={1}>
               {filteredDevices.map((device) => (
@@ -226,59 +289,19 @@ useEffect(() => {
                       sm: "49%",
                       md: "24%",
                     },
-                    padding: 0,
                   }}
                 >
-                  <Card
-                    onClick={() => onSelect(device)}
-                    sx={{
-                      height: "100%",
-                      borderRadius: "40px",
-                      backgroundColor: "#f3f4f6",
-                      padding: "40px 24px",
-                      textAlign: "center",
-                      boxShadow: "0 6px 20px rgba(0,0,0,0.05)",
-                      transition: "all 0.25s ease",
-                      "&:hover": {
-                        transform: "translateY(-6px)",
-                      },
-                    }}
-                  >
-                    {/* Image */}
-                    <Box
-                      sx={{
-                        height: 160,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mb: 3,
-                      }}
-                    >
-                      <Box
-                        component="img"
-                        src={`${BASE_URL}/v1/flavors/${device?.flavor}/productimage`}
-                        sx={{
-                          maxHeight: 130,
-                          maxWidth: "100%",
-                          objectFit: "contain",
-                        }}
-                      />
-                    </Box>
-
-                    <Typography fontWeight={700} fontSize={16}>
-                      {device.description || device.name}
-                    </Typography>
-
-                    <Typography variant="body2" color="text.secondary">
-                      Requires {device.quotas?.cores ?? 1} CPU cores
-                    </Typography>
-                  </Card>
+                  <DeviceCard
+                    device={device}
+                    baseUrl={BASE_URL}
+                    onSelect={handleSelect}
+                  />
                 </Grid>
               ))}
             </Grid>
           )}
 
-          {/* ===== BACK BUTTON ===== */}
+          {/* BACK BUTTON */}
           <Box textAlign="center">
             <Typography
               sx={{

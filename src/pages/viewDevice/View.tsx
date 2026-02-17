@@ -53,7 +53,7 @@ export default function View() {
           }}
         >
           <Box>
-            <Typography fontWeight={600}>Connect to AutoCloud</Typography>
+            <Typography fontWeight={600}>Connect to Cubic Corp</Typography>
             <Typography variant="body2" color="text.secondary">
               <Box
                 component="span"
@@ -70,7 +70,7 @@ export default function View() {
             </Typography>
           </Box>
 
-          <Box display="flex" gap={1} flexWrap="wrap">
+          {/* <Box display="flex" gap={1} flexWrap="wrap">
             <Button variant="outlined">Open Console</Button>
             <Button variant="outlined">Snapshot</Button>
             <Button variant="contained" startIcon={<PlayArrowIcon />}>
@@ -85,7 +85,7 @@ export default function View() {
             <IconButton>
               <PowerSettingsNewIcon />
             </IconButton>
-          </Box>
+          </Box> */}
         </CardContent>
       </Card>
 

@@ -234,7 +234,7 @@ export default function Settings() {
                 <TextField
                   fullWidth
                   size="small"
-                  value="AutoCloud"
+                  value="Cubic Corp"
                   sx={{
                     mb: 3,
                     "& .MuiOutlinedInput-root": {
