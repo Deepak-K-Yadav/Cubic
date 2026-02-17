@@ -52,11 +52,9 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
         if (!response.ok) throw new Error("Failed to fetch firmware list");
 
         const data = await response.json();
-
         setFirmwareList(data || []);
 
         if (data && data.length > 0) {
-          // ✅ Use filename as stable unique value
           setFirmware(data[0].filename);
         }
       } catch (error) {
@@ -83,14 +81,11 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
     setDragging(true);
   };
 
-  const handleDragLeave = () => {
-    setDragging(false);
-  };
+  const handleDragLeave = () => setDragging(false);
 
   const handleDrop = (event: React.DragEvent) => {
     event.preventDefault();
     setDragging(false);
-
     if (event.dataTransfer.files && event.dataTransfer.files[0]) {
       setUploadedFile(event.dataTransfer.files[0]);
     }
@@ -99,17 +94,18 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
   return (
     <Box
       sx={{
-        minHeight: "100vh",       
+        minHeight: "60vh",
         display: "flex",
         alignItems: "center",
+        
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="md">
         <Typography
           variant="h5"
-          fontWeight={600}
+          fontWeight={700}
           textAlign="center"
-          mb={6}
+          mb={8}
         >
           Configure your device
         </Typography>
@@ -128,18 +124,14 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
             <TextField
               select
               fullWidth
+             
               value={firmware}
               onChange={(e) => setFirmware(e.target.value)}
-              sx={{ mb: 2 }}
-              SelectProps={{
-                MenuProps: {
-                  PaperProps: {
-                    sx: {
-                      maxHeight: 320,
-                      maxWidth: 520,
-                    },
-                  },
-                },
+              sx={{
+                mb: 3,
+                backgroundColor: "rgba(255,255,255,0.7)",
+                borderRadius: 2,
+                maxWidth: 400,
               }}
             >
               {loadingFirmware ? (
@@ -150,26 +142,16 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
                 <MenuItem disabled>No firmware available</MenuItem>
               ) : (
                 firmwareList.map((item: any) => (
-                  <MenuItem
-                    key={item.filename}
-                    value={item.filename}
-                    sx={{
-                      whiteSpace: "normal",
-                      wordBreak: "break-word",
-                    }}
-                  >
+                  <MenuItem key={item.filename} value={item.filename}>
                     {item.name} ({item.filename})
                   </MenuItem>
                 ))
               )}
             </TextField>
 
-            <Link
-              underline="hover"
-              sx={{ display: "inline-flex", alignItems: "center", mb: 4 }}
-            >
+            {/* <Link underline="hover" sx={{ mb: 4, display: "inline-block" }}>
               🔗 Source Image
-            </Link>
+            </Link> */}
 
             <Typography variant="body2" mb={1}>
               RAM
@@ -180,7 +162,11 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
               fullWidth
               value={ram}
               onChange={(e) => setRam(Number(e.target.value))}
-              sx={{ mb: 4 }}
+              sx={{
+                mb: 4,
+                backgroundColor: "rgba(255,255,255,0.7)",
+                borderRadius: 2,
+              }}
             >
               <MenuItem value={2}>2 GB RAM</MenuItem>
               <MenuItem value={4}>4 GB RAM</MenuItem>
@@ -189,18 +175,15 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
 
             <Button
               variant="contained"
+              disabled={!firmware}
               sx={{
                 px: 5,
-                borderRadius: 2,
+                py: 1.2,
+                borderRadius: 3,
                 textTransform: "none",
+                fontWeight: 600,
               }}
-              disabled={!firmware}
-              onClick={() =>
-                onComplete({
-                  firmware,
-                  ram,
-                })
-              }
+              onClick={() => onComplete({ firmware, ram })}
             >
               Select
             </Button>
@@ -217,13 +200,18 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
               position: "relative",
             }}
           >
-            <Divider orientation="vertical" flexItem />
+            <Divider
+              orientation="vertical"
+              flexItem
+              sx={{ borderColor: "rgba(0,0,0,0.15)" }}
+            />
             <Typography
               sx={{
                 position: "absolute",
-                bgcolor: "#e9edf6",
+                background: "rgba(255,255,255,0.6)",
                 px: 2,
-                fontSize: 14,
+                fontWeight: 500,
+                color: "text.secondary",
               }}
             >
               Or
@@ -244,26 +232,30 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
             />
 
             <Paper
+              elevation={0}
               variant="outlined"
               onClick={() => fileInputRef.current?.click()}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               sx={{
-                p: 5,
+                p: 6,
                 textAlign: "center",
                 borderStyle: "dashed",
-                borderColor: dragging ? "#1976d2" : "#c5c9d6",
+                borderWidth: 2,
+                borderColor: dragging
+                  ? "#1976d2"
+                  : "rgba(0,0,0,0.2)",
                 backgroundColor: dragging
                   ? "rgba(25,118,210,0.08)"
-                  : "rgba(255,255,255,0.6)",
-                borderRadius: 2,
-                mb: 2,
+                  : "rgba(255,255,255,0.5)",
+                borderRadius: 3,
                 cursor: "pointer",
+                transition: "all 0.2s ease",
+                mb: 2,
               }}
             >
-              <UploadIcon sx={{ fontSize: 40, mb: 2 }} />
-
+              <UploadIcon sx={{ fontSize: 42, mb: 2 }} />
               <Typography>
                 Drag file here or <b>browse</b> to upload
               </Typography>
@@ -279,14 +271,13 @@ export default function ConfigureStep({ onComplete, onBack }: Props) {
               variant="contained"
               disabled={!uploadedFile}
               sx={{
-                borderRadius: 2,
+                px: 4,
+                py: 1.2,
+                borderRadius: 3,
                 textTransform: "none",
+                fontWeight: 600,
               }}
-              onClick={() =>
-                onComplete({
-                  uploadedFile,
-                })
-              }
+              onClick={() => onComplete({ uploadedFile })}
             >
               Next
             </Button>

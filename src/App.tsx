@@ -43,7 +43,7 @@ export default function App() {
           <Route index element={<DashboardPage />} />
           <Route path="devices" element={<AddDevice />} />
           <Route path="setting" element={<Settings />} />
-         <Route path="view-new" element={<View />} />
+         <Route path="sensor" element={<View />} />
         </Route>
 
         {/* Second Layout with Left Nav */}

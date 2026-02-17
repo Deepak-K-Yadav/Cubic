@@ -71,7 +71,8 @@ function playTone(type = "go") {
 function ListDevice() {
   ////
 
-  const WS_URL = import.meta.env.VITE_MQTT_WS || "wss://cubic.judgeindiasolutions.com:mqtt";
+  const WS_URL =
+    import.meta.env.VITE_MQTT_WS || "wss://cubic.judgeindiasolutions.com:mqtt";
   const REQ_TOPIC = import.meta.env.VITE_REQ_TOPIC || "motu/tap/request";
   const RESP_TOPIC = import.meta.env.VITE_RESP_TOPIC || "motu/tap/response";
 
@@ -246,6 +247,34 @@ function ListDevice() {
         >
           <ArrowBackIcon fontSize="small" />
           <Typography fontWeight={600}>Back</Typography>
+        </Box>
+
+        {/* Right Links */}
+        <Box
+          sx={{
+            position: "absolute",
+            right: 0,
+            top: "50%",
+            transform: "translateY(-50%)",
+            display: "flex",
+            alignItems: "center",
+            gap: 3,
+          }}
+        >
+          <Typography
+            sx={{ cursor: "pointer", fontWeight: 600 }}
+            onClick={() => navigate("/sensor")}
+          >
+            sensor
+          </Typography>
+          ||
+
+          <Typography
+            sx={{ cursor: "pointer", fontWeight: 600 }}
+            onClick={() => navigate("/setting")}
+          >
+            config
+          </Typography>
         </Box>
 
         {/* Title - Center */}
