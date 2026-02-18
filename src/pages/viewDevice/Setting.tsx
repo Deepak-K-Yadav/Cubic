@@ -124,11 +124,11 @@ export default function Settings( props: { deviceName?: string; model?: string }
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        px: { xs: 2, md: 4 },
-        py: { xs: 3, md: 4 },
-        background:
-          "linear-gradient(180deg, #eef3fb 0%, #f6f8fc 40%, #f4f6fa 100%)",
+        // minHeight: "100vh",
+        // px: { xs: 2, md: 4 },
+         py: { xs: 3, md: 4 },
+        // background:
+        //   "linear-gradient(180deg, #eef3fb 0%, #f6f8fc 40%, #f4f6fa 100%)",
       }}
     >
       {/* <Typography

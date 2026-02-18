@@ -23,12 +23,12 @@ import DownloadIcon from "@mui/icons-material/Download";
 export default function View() {
   return (
     <Box
-      sx={{
-        minHeight: "100vh",
-        background:
-          "linear-gradient(135deg, #eaf1fb 0%, #f6f8fc 50%, #eef2fa 100%)",
-        p: { xs: 2, md: 4 },
-      }}
+      // sx={{
+      //   minHeight: "100vh",
+      //   background:
+      //     "linear-gradient(135deg, #eaf1fb 0%, #f6f8fc 50%, #eef2fa 100%)",
+      //   p: { xs: 2, md: 4 },
+      // }}
     >
       {/* Breadcrumb */}
       {/* <Typography variant="body2" sx={{ color: "#5f6b7a", mb: 2 }}>
