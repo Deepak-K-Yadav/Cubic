@@ -1,37 +1,55 @@
+import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
+import { Box, CircularProgress } from "@mui/material";
+
 import DashboardLayout from "./layout/DashboardLayout";
 import LeftNavLayout from "./layout/LeftNavLayout";
-import DashboardPage from "./pages/dashboard/DashboardPage";
-import AddDevice from "./pages/devices";
-import ListDevice from "./pages/viewDevice";
+import Settings from "./pages/viewDevice/Setting";
+import View from "./pages/viewDevice/View";
 
 import "./App.css";
-import Admin from "./pages/LeftSidebarPages/Admin";
-import Hardware from "./pages/LeftSidebarPages/Hardware";
-import Lab from "./pages/LeftSidebarPages/Lab";
-import Network from "./pages/LeftSidebarPages/Network";
-import Settings from "./pages/viewDevice/Setting";
 
+/* -------------------- Lazy Load Pages -------------------- */
+const DashboardPage = lazy(() => import("./pages/dashboard/DashboardPage"));
+const AddDevice = lazy(() => import("./pages/devices"));
+const ListDevice = lazy(() => import("./pages/viewDevice"));
+
+/* -------------------- Loader Component -------------------- */
+function Loader() {
+  return (
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fff",
+      }}
+    >
+      <CircularProgress size={50} />
+    </Box>
+  );
+}
+
+/* -------------------- App Component -------------------- */
 export default function App() {
   return (
-    <Routes>
-      {/* First Layout */}
-      {/* <Route path="/" element={<DashboardLayout />}> */}
+    <Suspense fallback={<Loader />}>
+      <Routes>
+        {/* First Layout */}
+        <Route path="/" element={<DashboardLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="devices" element={<AddDevice />} />
+          <Route path="setting" element={<Settings />} />
+          <Route path="sensor" element={<View />} />
+        </Route>
 
-      <Route path="/" element={<LeftNavLayout />}>
-        <Route index element={<DashboardPage />} />
-        <Route path="devices" element={<AddDevice />} />
-        <Route path="admin" element={<Admin />} />
-        <Route path="network" element={<Network />} />
-        <Route path="hardware" element={<Hardware />} />
-        <Route path="lab" element={<Lab />} />
-        <Route path="setting" element={<Settings />} />
-      </Route>
-
-      {/* Second Layout with Left Nav */}
-      <Route path="/view" element={<LeftNavLayout />}>
-        <Route index element={<ListDevice />} />
-      </Route>
-    </Routes>
+        {/* Second Layout with Left Nav */}
+        <Route path="/view" element={<LeftNavLayout />}>
+          <Route index element={<ListDevice />} />
+          <Route path=":id" element={<ListDevice />} />
+        </Route>
+      </Routes>
+    </Suspense>
   );
 }

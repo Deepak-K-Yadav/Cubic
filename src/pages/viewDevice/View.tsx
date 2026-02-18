@@ -23,23 +23,23 @@ import DownloadIcon from "@mui/icons-material/Download";
 export default function View() {
   return (
     <Box
-      sx={{
-        minHeight: "100vh",
-        background:
-          "linear-gradient(135deg, #eaf1fb 0%, #f6f8fc 50%, #eef2fa 100%)",
-        p: { xs: 2, md: 4 },
-      }}
+    // sx={{
+    //   minHeight: "100vh",
+    //   background:
+    //     "linear-gradient(135deg, #eaf1fb 0%, #f6f8fc 50%, #eef2fa 100%)",
+    //   p: { xs: 2, md: 4 },
+    // }}
     >
       {/* Breadcrumb */}
-      <Typography variant="body2" sx={{ color: "#5f6b7a", mb: 2 }}>
+      {/* <Typography variant="body2" sx={{ color: "#5f6b7a", mb: 2 }}>
         Devices / Auto Cloud
-      </Typography>
+      </Typography> */}
 
       {/* Top Action Bar */}
       <Card
         sx={{
           mb: 3,
-          borderRadius: 0.5,
+          borderRadius: 1,
           boxShadow: "0px 8px 25px rgba(0,0,0,0.05)",
         }}
       >
@@ -53,7 +53,7 @@ export default function View() {
           }}
         >
           <Box>
-            <Typography fontWeight={600}>Connect to AutoCloud</Typography>
+            <Typography fontWeight={600}>Connect to Cubic Corp</Typography>
             <Typography variant="body2" color="text.secondary">
               <Box
                 component="span"
@@ -70,51 +70,31 @@ export default function View() {
             </Typography>
           </Box>
 
-          <Box display="flex" gap={1} flexWrap="wrap">
-            <Button variant="outlined" sx={{ borderRadius: 0.5 }}>
-              Open Console
-            </Button>
-            <Button variant="outlined" sx={{ borderRadius: 0.5 }}>
-              Snapshot
-            </Button>
-            <Button
-              variant="contained"
-              sx={{ borderRadius: 0.5 }}
-              startIcon={<PlayArrowIcon />}
-            >
+          {/* <Box display="flex" gap={1} flexWrap="wrap">
+            <Button variant="outlined">Open Console</Button>
+            <Button variant="outlined">Snapshot</Button>
+            <Button variant="contained" startIcon={<PlayArrowIcon />}>
               Start
             </Button>
-            <Button
-              variant="outlined"
-              sx={{ borderRadius: 0.5 }}
-              startIcon={<RestartAltIcon />}
-            >
+            <Button variant="outlined" startIcon={<RestartAltIcon />}>
               Restart
             </Button>
-            <Button
-              variant="outlined"
-              sx={{ borderRadius: 0.5 }}
-              color="error"
-              startIcon={<DeleteIcon />}
-            >
+            <Button variant="outlined" color="error" startIcon={<DeleteIcon />}>
               Delete
             </Button>
             <IconButton>
               <PowerSettingsNewIcon />
             </IconButton>
-          </Box>
+          </Box> */}
         </CardContent>
       </Card>
 
       {/* Main Section */}
       <Grid container spacing={3}>
         {/* LEFT SECTION */}
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={{ xs: 12, md: 12 }}>
           <Card
-            sx={{
-              borderRadius: 0.5,
-              boxShadow: "0px 8px 25px rgba(0,0,0,0.05)",
-            }}
+            sx={{ borderRadius: 1, boxShadow: "0px 8px 25px rgba(0,0,0,0.05)" }}
           >
             <CardContent>
               {/* Quick SSH */}
@@ -134,7 +114,7 @@ export default function View() {
                   display: "flex",
                   alignItems: "center",
                   backgroundColor: "#f3f4f6",
-                  borderRadius: 0.5,
+                  borderRadius: 1,
                   border: "1px solid #e5e7eb",
                   overflow: "hidden",
                   mb: 2,
@@ -143,7 +123,7 @@ export default function View() {
                 <TextField
                   fullWidth
                   size="small"
-                  value="ssh -J user@proxy.avh.com pi@10.11.0.1"
+                  value="ssh -J 09950a8e-c304-4afc-a3f4-4f38967dd697@proxy.app.avh.corellium.com root@10.11.0.4"
                   variant="standard"
                   InputProps={{
                     disableUnderline: true,
@@ -158,11 +138,11 @@ export default function View() {
               {/* Inline Warning */}
               <Box
                 sx={{
-                  display: "flex",
+                  display: "none",
                   alignItems: "center",
                   gap: 1,
                   p: 1,
-                  borderRadius: 0.5,
+                  borderRadius: 1,
                   border: "1px solid #fecaca",
                   backgroundColor: "#fef2f2",
                   mb: 3,
@@ -201,7 +181,7 @@ export default function View() {
               <Button
                 variant="contained"
                 startIcon={<DownloadIcon />}
-                sx={{ mb: 3, borderRadius: 0.5 }}
+                sx={{ mb: 3 }}
               >
                 Download OVPN File
               </Button>
@@ -219,7 +199,7 @@ export default function View() {
                   display: "flex",
                   alignItems: "center",
                   backgroundColor: "#f3f4f6",
-                  borderRadius: 0.5,
+                  borderRadius: 1,
                   border: "1px solid #e5e7eb",
                   overflow: "hidden",
                 }}
@@ -281,12 +261,9 @@ export default function View() {
         </Grid>
 
         {/* RIGHT SECTION */}
-        <Grid size={{ xs: 12, md: 4 }}>
+        {/* <Grid size={{ xs: 12, md: 4 }}>
           <Card
-            sx={{
-              borderRadius: 0.5,
-              boxShadow: "0px 8px 25px rgba(0,0,0,0.05)",
-            }}
+            sx={{ borderRadius: 1, boxShadow: "0px 8px 25px rgba(0,0,0,0.05)" }}
           >
             <CardContent>
               <Box display="flex" justifyContent="space-between" mb={2}>
@@ -307,7 +284,7 @@ export default function View() {
               <Box
                 sx={{
                   height: 220,
-                  borderRadius: 0.2,
+                  borderRadius: 1,
                   backgroundImage:
                     "url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee')",
                   backgroundSize: "cover",
@@ -325,7 +302,7 @@ export default function View() {
               </Typography>
             </CardContent>
           </Card>
-        </Grid>
+        </Grid> */}
       </Grid>
     </Box>
   );

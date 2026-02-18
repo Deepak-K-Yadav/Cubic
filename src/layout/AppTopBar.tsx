@@ -59,7 +59,7 @@ export default function AppTopBar({
         borderBottom: "1px solid rgba(0,0,0,0.06)",
       }}
     >
-      <Container maxWidth="xl">
+      <Container maxWidth="xxl">
         <Toolbar
           sx={{
             justifyContent: "space-between",
@@ -146,7 +146,7 @@ export default function AppTopBar({
               <MenuItem
                 onClick={() => {
                   handleClose();
-                  navigate("/profile");
+                  navigate("/");
                 }}
                 sx={{ borderRadius: 2, mx: 1 }}
               >
@@ -159,7 +159,7 @@ export default function AppTopBar({
               <MenuItem
                 onClick={() => {
                   handleClose();
-                  navigate("/settings");
+                  navigate("/");
                 }}
                 sx={{ borderRadius: 2, mx: 1 }}
               >

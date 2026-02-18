@@ -1,308 +1,316 @@
-
 import {
   Container,
   Grid,
   Typography,
   Box,
   Card,
-  CardContent,
   TextField,
   InputAdornment,
   IconButton,
   Button,
   Stack,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { useState } from "react";
+import type { Device } from "../types";
+
+import React, { useEffect, useMemo, useState, useCallback, memo } from "react";
 
 type Props = {
-  onSelect: (device: string) => void;
+  onSelect: (device: Device) => void;
   onBack: () => void;
 };
 
-const devices = [
-  {
-    name: "Generic Android",
-    subtitle: "Requires 2 CPU cores",
-    image:
-      "https://images.unsplash.com/photo-1764557207226-bc72ae09ca43?q=80&w=764&auto=format&fit=crop",
-  },
-  {
-    name: "Raspberry Pi",
-    subtitle: "Requires 4 CPU cores",
-    image:
-      "https://images.unsplash.com/photo-1764557207226-bc72ae09ca43?q=80&w=764&auto=format&fit=crop",
-  },
-  {
-    name: "Jetson Nano",
-    subtitle: "Requires 4 CPU cores",
-    image:
-      "https://images.unsplash.com/photo-1764557207226-bc72ae09ca43?q=80&w=764&auto=format&fit=crop",
-  },
-  {
-    name: "ARM Board",
-    subtitle: "Requires 2 CPU cores",
-    image:
-      "https://images.unsplash.com/photo-1764557207226-bc72ae09ca43?q=80&w=764&auto=format&fit=crop",
-  },
-];
+type DeviceCardProps = {
+  device: any;
+  baseUrl: string;
+  onSelect: (device: any) => void;
+};
 
+/* =========================
+   MEMOIZED DEVICE CARD
+========================= */
+const DeviceCard = memo(function DeviceCard({
+  device,
+  baseUrl,
+  onSelect,
+}: DeviceCardProps) {
+  // 🔹 Memoized image URL
+  const imageUrl = useMemo(() => {
+    return `${baseUrl}/v1/flavors/${device?.flavor}/productimage`;
+  }, [baseUrl, device?.flavor]);
+
+  return (
+    <Card
+      onClick={() => onSelect(device)}
+      sx={{
+        height: "100%",
+        borderRadius: "40px",
+        backgroundColor: "#f3f4f6",
+        padding: "40px 34px",
+        textAlign: "center",
+        boxShadow: "0 6px 20px rgba(0,0,0,0.05)",
+        transition: "all 0.25s ease",
+        "&:hover": {
+          transform: "translateY(-6px)",
+        },
+      }}
+    >
+      <Box
+        sx={{
+          height: 160,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mb: 3,
+        }}
+      >
+        <Box
+          component="img"
+          src={imageUrl}
+          loading="lazy"
+          sx={{
+            maxHeight: 130,
+            maxWidth: "100%",
+            objectFit: "contain",
+          }}
+        />
+      </Box>
+
+      <Typography fontWeight={700} fontSize={16}>
+        {device.description || device.name}
+      </Typography>
+
+      <Typography variant="body2" color="text.secondary">
+        Requires {device.quotas?.cores ?? 1} CPU cores
+      </Typography>
+    </Card>
+  );
+});
+
+/* =========================
+   MAIN COMPONENT
+========================= */
 export default function SelectDevice({ onSelect, onBack }: Props) {
+  const BASE_URL = import.meta.env.VITE_CORELLIUM_BASE;
+  const API_KEY = import.meta.env.VITE_CORELLIUM_API_KEY;
+
+  const [devices, setDevices] = useState<any[]>([]);
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [showBanner, setShowBanner] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!devices.length) return;
+
+    const links: HTMLLinkElement[] = [];
+
+    devices.forEach((device) => {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = `${BASE_URL}/v1/flavors/${device?.flavor}/productimage`;
+      document.head.appendChild(link);
+      links.push(link);
+    });
+
+    return () => {
+      links.forEach((link) => document.head.removeChild(link));
+    };
+  }, [devices, BASE_URL]);
+
+  /* =========================
+     FETCH DEVICES
+  ========================= */
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/v1/models`, {
+          headers: {
+            Authorization: `Bearer ${API_KEY}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch models");
+
+        const data = await response.json();
+
+        const filteredData = data.filter(
+          (device: any) => device.model !== "ranchu",
+        );
+
+        console.log(filteredData);
+
+        setDevices(filteredData);
+      } catch (error) {
+        console.error("Models API Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchModels();
+  }, [BASE_URL, API_KEY]);
+
+  /* =========================
+     STABLE SELECT HANDLER
+  ========================= */
+  const handleSelect = useCallback(
+    (device: any) => {
+      onSelect(device);
+    },
+    [onSelect],
+  );
+
+  /* =========================
+     FILTERED DEVICES
+  ========================= */
+  const filteredDevices = useMemo(() => {
+    return devices.filter((device) => {
+      const matchesFilter =
+        filter === "All" || device.type?.toLowerCase() === filter.toLowerCase();
+
+      const matchesSearch =
+        device.name?.toLowerCase().includes(search.toLowerCase()) ||
+        device.description?.toLowerCase().includes(search.toLowerCase());
+
+      return matchesFilter && matchesSearch;
+    });
+  }, [devices, filter, search]);
 
   return (
-    <Box sx={{ py: 6 }}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        py: 8,
+      }}
+    >
       <Container maxWidth="lg">
-        <Grid container spacing={6}>
-          
-          {/* Back Button */}
-          {/* <Grid size={12}>
+        <Stack spacing={6}>
+          {/* HEADER */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: { xs: "flex-start", md: "center" },
+              flexDirection: { xs: "column", md: "row" },
+              gap: 3,
+            }}
+          >
+            <Box>
+              <Typography variant="h5" fontWeight={700}>
+                Select Device
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                * Includes Rapid Start
+              </Typography>
+            </Box>
+
+            <Stack direction="row" spacing={2}>
+              <TextField
+                size="small"
+                placeholder="Search Devices"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                sx={{
+                  width: 260,
+                  background: "#fff",
+                  borderRadius: 2,
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <Stack
+                direction="row"
+                sx={{
+                  background: "#f3f4f6",
+                  borderRadius: 2,
+                  p: 0.5,
+                }}
+              >
+                {["All", "Android", "IoT"].map((item) => (
+                  <Button
+                    key={item}
+                    size="small"
+                    onClick={() => setFilter(item)}
+                    sx={{
+                      minWidth: 75,
+                      textTransform: "none",
+                      fontWeight: 600,
+                      borderRadius: 2,
+                      background:
+                        filter === item ? "primary.main" : "transparent",
+                      color: filter === item ? "#1807b4" : "text.primary",
+                    }}
+                  >
+                    {item}
+                  </Button>
+                ))}
+              </Stack>
+            </Stack>
+          </Box>
+
+          {/* LOADING */}
+          {loading && (
+            <Box textAlign="center" py={6}>
+              <CircularProgress />
+            </Box>
+          )}
+
+          {/* DEVICE GRID */}
+          {!loading && (
+            <Grid container spacing={1}>
+              {filteredDevices.map((device) => (
+                <Grid
+                  key={device.name}
+                  sx={{
+                    width: {
+                      xs: "100%",
+                      sm: "49%",
+                      md: "24%",
+                    },
+                  }}
+                >
+                  <DeviceCard
+                    device={device}
+                    baseUrl={BASE_URL}
+                    onSelect={handleSelect}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          )}
+
+          {/* BACK BUTTON */}
+          <Box textAlign="center">
             <Typography
               sx={{
                 cursor: "pointer",
-                color: "primary.main",
                 fontWeight: 500,
-                width: "fit-content",
+                "&:hover": {
+                  color: "primary.main",
+                },
               }}
               onClick={onBack}
             >
               ← Back
             </Typography>
-          </Grid> */}
-
-          {/* ===== Highlighted Section ===== */}
-          <Grid size={12}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: { xs: "flex-start", md: "center" },
-                flexDirection: { xs: "column", md: "row" },
-                gap: 3,
-              }}
-            >
-              {/* Title */}
-              <Box>
-                <Typography variant="h5" fontWeight={700}>
-                  Select Device
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  * Includes Rapid Start
-                </Typography>
-              </Box>
-
-              {/* Search + Filter */}
-              <Stack direction="row" spacing={2} alignItems="center">
-                <TextField
-                  size="small"
-                  placeholder="Search Devices"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  sx={{
-                    width: 240,
-                    background: "#fff",
-                    borderRadius: 2,
-                  }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon fontSize="small" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-
-                <Stack
-                  direction="row"
-                  sx={{
-                    background: "#f3f4f6",
-                    borderRadius: 2,
-                    p: 0.5,
-                  }}
-                >
-                  {["All", "Android", "IoT"].map((item) => (
-                    <Button
-                      key={item}
-                      size="small"
-                      onClick={() => setFilter(item)}
-                      sx={{
-                        minWidth: 70,
-                        textTransform: "none",
-                        fontWeight: 600,
-                        borderRadius: 2,
-                        background:
-                          filter === item
-                            ? "primary.main"
-                            : "transparent",
-                        color:
-                          filter === item
-                            ? "#fff"
-                            : "text.primary",
-                        "&:hover": {
-                          background:
-                            filter === item
-                              ? "primary.dark"
-                              : "rgba(0,0,0,0.05)",
-                        },
-                      }}
-                    >
-                      {item}
-                    </Button>
-                  ))}
-                </Stack>
-              </Stack>
-            </Box>
-          </Grid>
-
-          {/* Info Banner */}
-          {showBanner && (
-            <Grid size={12}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 3,
-                  borderRadius: 3,
-                  background:
-                    "linear-gradient(135deg, #f5f7fb 0%, #eef2f7 100%)",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                }}
-              >
-                <Box sx={{ display: "flex", gap: 2 }}>
-                  <InfoOutlinedIcon color="action" />
-
-                  <Box>
-                    <Typography fontWeight={600}>
-                      Need a device not listed here?
-                    </Typography>
-
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mt: 0.5 }}
-                    >
-                      Contact your sales person for pricing and availability.
-                    </Typography>
-
-                    <Button
-                      endIcon={<ArrowForwardIcon />}
-                      sx={{
-                        mt: 1.5,
-                        p: 0,
-                        textTransform: "none",
-                        fontWeight: 600,
-                      }}
-                    >
-                      Request a device
-                    </Button>
-                  </Box>
-                </Box>
-
-                <IconButton
-                  size="small"
-                  onClick={() => setShowBanner(false)}
-                >
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              </Paper>
-            </Grid>
-          )}
-
-          {/* ===== Device Cards ===== */}
-          <Grid size={12}>
-            <Grid container spacing={4}>
-              {devices.map((device) => (
-                <Grid key={device.name} size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Card
-                    onClick={() => onSelect(device.name)}
-                    sx={{
-                      height: "100%",
-                      cursor: "pointer",
-                      borderRadius: 3,
-                      p: 3,
-                      textAlign: "center",
-                      background: "#f5f5f7",
-                      boxShadow: "0 12px 40px rgba(0,0,0,0.06)",
-                      transition: "all 0.3s ease",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      "&:hover": {
-                        transform: "translateY(-8px)",
-                        boxShadow:
-                          "0 20px 50px rgba(0,0,0,0.1)",
-                      },
-                    }}
-                  >
-                    <CardContent sx={{ p: 0 }}>
-                      <Box
-                        component="img"
-                        src={device.image}
-                        alt={device.name}
-                        sx={{
-                          width: "100%",
-                          height: 200,
-                          objectFit: "cover",
-                          borderRadius: 2,
-                          mb: 3,
-                        }}
-                      />
-
-                      <Typography variant="h6" fontWeight={600}>
-                        {device.name}
-                      </Typography>
-
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mt: 1 }}
-                      >
-                        {device.subtitle}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Grid>
-          {/* Bottom Back Button */}
-<Grid size={12}>
-  <Box
-    sx={{
-      display: "flex",
-      justifyContent: "center",
-      mt: 4,
-    }}
-  >
-    <Typography
-      sx={{
-        cursor: "pointer",
-        fontWeight: 500,
-        display: "flex",
-        alignItems: "center",
-        gap: 1,
-        "&:hover": {
-          color: "primary.main",
-        },
-      }}
-      onClick={onBack}
-    >
-      ← Back
-    </Typography>
-  </Box>
-</Grid>
-
-        </Grid>
+          </Box>
+        </Stack>
       </Container>
     </Box>
   );
 }
-

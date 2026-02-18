@@ -1,4 +1,4 @@
-
+import { useState } from "react";
 import {
   Box,
   Card,
@@ -12,12 +12,24 @@ import {
 } from "@mui/material";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import CheckIcon from "@mui/icons-material/Check";
+import { useNavigate } from "react-router-dom";
+
+type DeviceType = {
+  type?: string;
+  name?: string;
+  flavor?: string;
+  description?: string;
+  model?: string;
+  peripherals?: any;
+  quotas?: any;
+} | null;
 
 type Props = {
   project: string | null;
-  device: string | null;
+  device: DeviceType;
   config: any;
   onBack: () => void;
+  onReset: () => void;
 };
 
 export default function ConfirmStep({
@@ -25,16 +37,69 @@ export default function ConfirmStep({
   device,
   config,
   onBack,
+  onReset,
 }: Props) {
+  const [deviceName, setDeviceName] = useState(config?.deviceName || "");
+  const [touched, setTouched] = useState(false);
+  const [apiMessage, setApiMessage] = useState<string | null>(null);
+  const [isErrorMessage, setIsErrorMessage] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const BASE_URL = "https://judge.app.avh.corellium.com/api";
+  const API_KEY = import.meta.env.VITE_CORELLIUM_API_KEY;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDeviceName(e.target.value);
+  };
+
+  const handleCreate = async () => {
+    debugger;
+    if (!deviceName.trim() || !project || !device) return;
+
+    setLoading(true);
+    setApiMessage(null);
+
+    try {
+      const response = await fetch(`${BASE_URL}/v1/instances`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          project: project,
+          name: deviceName.trim(),
+          flavor: device?.flavor || "imx93",
+          os: config?.os || "imx93",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setIsErrorMessage(true);
+        setApiMessage(data?.error || "Failed to create device");
+        return;
+      }
+
+      setIsErrorMessage(false);
+      setApiMessage("Device created successfully 🎉");
+      setTimeout(() => {
+        navigate("/");
+      }, 5000); // 5000ms = 5 seconds
+    } catch (error: any) {
+      setIsErrorMessage(true);
+      setApiMessage(error.message || "Unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isError = touched && !deviceName.trim();
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        px: { xs: 2, md: 4 },
-        py: { xs: 4, md: 6 },
-      }}
-    >
+    <Box display="flex" justifyContent="center">
       <Card
         sx={{
           width: "100%",
@@ -53,9 +118,7 @@ export default function ConfirmStep({
             mb={4}
           >
             <Box display="flex" alignItems="center" gap={1.5}>
-              <SettingsOutlinedIcon
-                sx={{ color: "#2f6fdd", fontSize: 22 }}
-              />
+              <SettingsOutlinedIcon sx={{ color: "#2f6fdd", fontSize: 22 }} />
               <Typography variant="h6" fontWeight={600}>
                 Device Configuration
               </Typography>
@@ -72,24 +135,35 @@ export default function ConfirmStep({
             </Avatar>
           </Box>
 
+          {/* ✅ API Message (Design Safe) */}
+          {apiMessage && (
+            <Typography
+              mb={3}
+              sx={{
+                color: isErrorMessage ? "#d32f2f" : "#2e7d32",
+                fontWeight: 500,
+              }}
+            >
+              {apiMessage}
+            </Typography>
+          )}
+
           {/* Content */}
           <Grid container spacing={6}>
-            {/* LEFT SIDE */}
-            {/* <Grid item xs={12} md={6}> */}
-             <Grid size={{ xs: 12, md: 6 }}>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                mb={1}
-              >
-                Device name
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Typography variant="body2" color="text.secondary" mb={1}>
+                Device name *
               </Typography>
 
               <TextField
                 fullWidth
                 size="small"
-                value={config?.deviceName || "lively-deer"}
-                disabled
+                value={deviceName}
+                onChange={handleChange}
+                onBlur={() => setTouched(true)}
+                placeholder="Enter device name"
+                error={isError}
+                helperText={isError ? "Device name is required" : ""}
                 sx={{
                   mb: 4,
                   "& .MuiOutlinedInput-root": {
@@ -98,49 +172,38 @@ export default function ConfirmStep({
                 }}
               />
 
-              <Typography
-                variant="body2"
-                color="text.secondary"
-              >
+              <Typography variant="body2" color="text.secondary">
                 Model
               </Typography>
+
               <Typography mt={1} mb={4}>
-                {device || "i.MX 8M Plus"}
+                {device?.name || device?.model}
               </Typography>
 
-              <Typography
-                variant="body2"
-                color="text.secondary"
-              >
+              <Typography variant="body2" color="text.secondary">
                 Firmware type
               </Typography>
+
               <Typography mt={1}>
-                Stock example
+                {/* {config?.firmware || "Not selected"} */}
+                Stock Example
               </Typography>
             </Grid>
-            {/* <Grid item xs={12} md={6} sx={{
-      pl: { xs: 0, md: 6 }, 
-    }}> */}
-      <Grid size={{ xs: 12, md: 6 }} sx={{ pl: { xs: 0, md: 6 } }}>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-              >
+
+            <Grid size={{ xs: 12, md: 6 }} sx={{ pl: { xs: 0, md: 6 } }}>
+              <Typography variant="body2" color="text.secondary">
                 Project
               </Typography>
+
               <Typography mt={1} mb={4}>
-                {project || "Default Project"}
+                {project}
               </Typography>
 
-              <Typography
-                variant="body2"
-                color="text.secondary"
-              >
+              <Typography variant="body2" color="text.secondary">
                 Firmware name
               </Typography>
-              <Typography mt={1}>
-                Yocto Linux (full) (2.2.1)
-              </Typography>
+
+              <Typography mt={1}>{config?.firmware}</Typography>
             </Grid>
           </Grid>
 
@@ -152,14 +215,12 @@ export default function ConfirmStep({
             </Typography>
           </Box>
 
-          {/* Button */}
-          <Box
-            mt={5}
-            display="flex"
-            justifyContent="center"
-          >
+          {/* Create Button */}
+          <Box mt={5} display="flex" justifyContent="center">
             <Button
               variant="contained"
+              onClick={handleCreate}
+              disabled={!deviceName.trim() || loading}
               sx={{
                 backgroundColor: "#0b3d91",
                 px: 5,
@@ -172,9 +233,11 @@ export default function ConfirmStep({
                 },
               }}
             >
-              Create device
+              {loading ? "Creating..." : "Create device"}
             </Button>
           </Box>
+
+          {/* Back Button */}
           <Box mt={4} textAlign="center">
             <Button
               variant="text"
@@ -192,4 +255,3 @@ export default function ConfirmStep({
     </Box>
   );
 }
-
